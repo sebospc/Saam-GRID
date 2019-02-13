@@ -4,13 +4,11 @@
   "description": "Graph",
   "main": "main.js",
   "scripts": {
-    "start": "electron .",
-    "package-win": "electron-packager . saam --overwrite --asar=true --platform=win32 --arch=ia32 --icon=resources/icons/saam.ico --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"saam\"",
-    "package-linux": "electron-packager . electron-tutorial-app --overwrite --asar=true --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=release-builds"
+    "start": "electron ."
   },
   "repository": {
     "type": "git",
-    "url": "https://saamapp.visualstudio.com/Saam/_git/Saam"
+    "url": "https://github.com/sebospc/saam-telematica"
   },
   "author": "Ospina Echavarria Shanchez",
   "license": "ISC",
@@ -19,7 +17,6 @@
     "chroma-js": "^1.4.0",
     "d3": "^5.7.0",
     "electron": "^2.0.8",
-    "electron-packager": "^13.0.1",
     "grunt": "^1.0.3",
     "mongodb": "^3.1.9",
     "spinkit": "^1.2.5",

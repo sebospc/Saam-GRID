@@ -7,70 +7,19 @@ const width = screen.width;
 const height = screen.height;
 const radius = (width * 2) / 70;
 const linkWidth = radius / 10;
-
-var auxLabel;
-var idLabelSource = null;
-var idLabelDestiny = null;
-
-
-var edges_value_copy;
-var nodes_value_copy;
-
-const menu = new Menu()
-menu.append(new MenuItem({
-    label: 'Select source', click() {
-        idLabelSource = auxLabel;
-        if (idLabelDestiny != null) {
-            var aux = getNext(idLabelSource, idLabelDestiny, edges_value_copy, {});
-            if (JSON.stringify(aux) == null) {
-                aux = getNext(idLabelDestiny, idLabelSource, edges_value_copy, {});
-            }
-            console.log(aux)
-            if (aux != null) {
-
-                highlight_from_routes(aux)
-            }
-        }
+const highlight_color = "#111"; //this color will be used when user clicks on one node.
+const default_link_color = "#888";
+const nominal_stroke = 1.5; //stroke width
+const default_border_color = "#00AFB7"
+const highlight_trans = 0.1;
+const firstSelectNodeColor = "#FF5733";
+const secondSelectNodeColor = "#333FFF";
 
 
-    }
-}))
-//menu.append(new MenuItem({ type: 'separator' }))
-menu.append(new MenuItem({
-    label: 'Select destiny', click() {
-        idLabelDestiny = auxLabel;
-        console.log(edges_value_copy)
-        if (idLabelSource != null) {
-            var aux = getNext(idLabelSource, idLabelDestiny, edges_value_copy, {})
-            if (aux == null)
-                aux = getNext(idLabelDestiny, idLabelSource, edges_value_copy, {})
-
-            console.log(aux)
-            if (aux != null) {
-
-                highlight_from_routes(aux)
-            }
-
-        }
-    }
-}))
-
-
-
-
-var keysArr = [];
-
-var default_link_color = "#888";
-
-var nominal_stroke = 1.5; //stroke width
 
 var focus_node = null, highlight_node = null; //this variables will be used to occult the nodes.
 
-var highlight_color = "#111"; //this color will be used when user clicks on one node.
 
-var default_border_color = "#00AFB7"
-
-var highlight_trans = 0.1;
 
 var svg = d3.select('svg')
     .attr("width", width)
@@ -84,14 +33,52 @@ var linkedByIndex = {};
 var g = svg.append("g").attr("class", "everything");
 var drag_handler;
 
+
+var auxClickedNodeMenu;
+var firstNodeClick = null;
+var secondNodeClick = null;
+
+
+var edges_value_copy;
+var nodes_value_copy;
+
+const menu = new Menu()
+menu.append(new MenuItem({
+    label: 'Select source', click() {
+        firstNodeClick = auxClickedNodeMenu;
+        circle.style("stroke", function (o) {
+            return (o.Id == firstNodeClick.Id)? firstSelectNodeColor : default_border_color;
+        });
+        text.style("font-weight", function (o) {
+            return isConnected(d, o) ? "bold" : "normal";
+        });
+    }
+}))
+//menu.append(new MenuItem({ type: 'separator' }))
+menu.append(new MenuItem({
+    label: 'Select destiny', click() {
+        secondNodeClick = auxClickedNodeMenu;
+        circle.style("stroke", function (o) {
+            return (o.Id == secondNodeClick.Id)? secondSelectNodeColor : default_border_color;
+        });
+        text.style("font-weight", function (o) {
+            return isConnected(d, o) ? "bold" : "normal";
+        });
+    }
+}))
+
+
+
+
+
 exec();
 
 async function exec() {
     nodes_value = await server.getNodes();
-    nodes_value_copy = JSON.parse(nodes_value);
+    //nodes_value_copy = JSON.parse(nodes_value);
 
     edges_value = await server.getEdges();
-    edges_value_copy = JSON.parse(edges_value);
+    //edges_value_copy = JSON.parse(edges_value);
 
     //console.log(edges_value)
     //console.log("result: " + JSON.stringify(getNext(46, 40,JSON.parse(edges_value), [])))
@@ -314,7 +301,6 @@ function assignPosition(nodes) {
             }
             item.y = height;
         } else if (item.type == 1) {
-            keysArr.push(item.Label)
             if (left) {
                 item.x = xPositionPerTypeLeft.xtype1;
                 xPositionPerTypeLeft.xtype1 -= radius * 2;
