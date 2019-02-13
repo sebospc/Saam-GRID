@@ -1,0 +1,30 @@
+
+.modal {
+    display: none;
+    position: absolute;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-header h2, .modal-footer h3 {
+    margin: 0;
+    overflow-x: hidden;
+}
+
+
+.modal-content {
+    position: absolute;
+    background-color: #dddddd; 
+    opacity: 0.95;
+    padding-right: 4%;
+    padding-left: 6%;
+    padding-top:1%;
+    width: 40%;
+    right:24%;
+    box-shadow: 0 5px 8px 0 rgba(0, 0, 0, 0.8), 0 7px 20px 0 rgba(0, 0, 0, 0.4);
+}

@@ -1,0 +1,93 @@
+<meta charset="utf-8">
+<title>Graph</title>
+<link rel="stylesheet" type="text/css" href="main.css">
+<link rel="stylesheet" type="text/css" href="../modal/modal.css">
+<link rel="stylesheet" type="text/css" href="../graph/graph2D.css">
+<link rel="stylesheet" type="text/css" href="../equalizer/equalizer.css">
+<link rel="stylesheet" type="text/css" href="../../../resources/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="../menu/menu.css">
+
+
+
+
+<nav class="nav-main">
+    <div class="btn-toggle-nav" onclick="toggleNav()"></div>
+    <ul>
+
+        <li> <a href="#" onclick="undo()"> <i class="fa fa-undo" aria-hidden="true"></i> undo</a></li>
+        <li><a href="#" onclick="redo()"><i class="fa fa-repeat" aria-hidden="true"></i> redo</a></li>
+        <li><a href="#" onclick="resize()"><i class="fa fa-expand" aria-hidden="true"></i> resize</a></li>
+        <li><a href="#" onclick="exitOfModel()"><i class="fa fa-times" aria-hidden="true"></i> exit</a></li>
+        <li><a href="#" onclick="saveModel()"><i class="fa fa-save" aria-hidden="true"></i> save</a></li>
+
+        <li><a href="#" style="position: absolute; right: 0%; width: 14%; ">
+                <label style="padding: 10px">Effects </label>
+            
+                
+            <label class="switch">
+            <input type="checkbox" id="checkEffect" checked onclick="disabEnabEffect()">
+            <span class="slider round"></span>
+            </label></li></a>
+    </ul>
+</nav>
+<aside class="nav-sidebar">
+    <ul>
+        <li><span><i class="fa fa-cogs" aria-hidden="true"></i> Settings</span></li>
+        <li><a href="#" onclick="addModificators()"><i class="fa fa-users" aria-hidden="true"></i> Add collaborator</a></li>
+        <li><a href="#" onclick="changeModel()"><i class="fa fa-area-chart" aria-hidden="true"></i> Change model</a></li>
+        <li><a href="#" onclick="originalModel()"><i class="fa fa-window-restore" aria-hidden="true"></i> Reset model</a></li>
+        <li><a href="#" onclick="aboutUs()" style="bottom:0%;position:absolute;"><i class="fa fa-envelope-open"
+                    aria-hidden="true"></i> About us</a></li>
+        <li><a href="#" onclick="logOut()" style="bottom:8%;position: absolute;"><i class="fa fa-sign-out" aria-hidden="true"></i>
+                Sign out</a></li>
+        <li><a href="#" onclick="getInfo()" style="bottom:16%;position: absolute;"><i class="fa fa-info" aria-hidden="true"></i>
+                Model info</a></li>
+    </ul>
+</aside>
+<html>
+
+<body>
+    <svg width="100%" height="100%">
+        <defs>
+            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color: #00afb7;stop-opacity:1" />
+                <stop offset="55%" style="stop-color:#34bfc6;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#4fcfd6;stop-opacity:1" />
+            </linearGradient>
+        </defs>
+    </svg>
+
+
+
+    <div id="simpleModal" class="modal">
+
+        <div class="modal-content">
+            <label id="actualChar" class="labelChar"></label>
+            <div class="slidecontainer">
+                <input type="range" min="0" max="100" value="0" class="slider2" id="rangeSlider">
+                <svg width="100%" height="240%">
+                    <line id="rangeLine" class="svgLine" />
+                </svg>
+            </div>
+            <canvas id="myChart" width="500" height="500" class="chartCanvas"></canvas>
+            <form>
+                Set value: <input type="text" id="expected" >
+                <button type="button" id="setBttn">Set</button><br>
+                Actual value: <label id="actual" class="label"> 0</label>
+                <button type="button" id="getEqBttn"  >Get Equalizer</button>
+            </form>
+        </div>
+
+    </div>
+
+
+    <script type="text/javascript" src="../menu/menu.js"></script> <!-- menu functionality -->
+    <script type="text/javascript" src="../modal/modal.js"></script>
+    <script type="text/javascript" src="main.js"></script>
+    <script type="text/javascript" src="../equalizer/equalizer.js"></script>
+    <script type="text/javascript" src="../graph/graph2D.js"></script>
+
+
+</body>
+
+</html>

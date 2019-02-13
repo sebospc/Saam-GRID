@@ -1,0 +1,40 @@
+@font-face {
+    font-family: Poppins-Regular;
+    src: url('../../../resources/fonts/poppins/Poppins-Regular.ttf'); 
+  }
+
+line {
+    stroke-width:5;
+    opacity: 0.8;
+}
+
+text {
+    font-family: Poppins-Regular,sans-serif;
+    pointer-events: none;
+}
+
+body{ 
+  background-image: "white";
+}
+
+.noselect {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.svgCircleType0{
+  fill: url("#grad1");
+}
+.svgCircleType1{
+  fill: url("#grad2");
+}
+.svgCircleType2{
+  fill: url("#grad3");
+}
+.svgCircleType3{
+  fill: url("#grad4");
+}
