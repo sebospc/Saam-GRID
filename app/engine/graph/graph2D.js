@@ -45,24 +45,67 @@ var nodes_value_copy;
 const menu = new Menu()
 menu.append(new MenuItem({
     label: 'Select source', click() {
+
+        if (firstNodeClick != null) {
+            circle.style("stroke", function (o) {
+                return isSelected(o, default_border_color);
+            });
+            text.style("font-weight", function (o) {
+                return "normal";
+            });
+        }
         firstNodeClick = auxClickedNodeMenu;
+        if (secondNodeClick != null)
+            if (firstNodeClick.Id == secondNodeClick.Id)
+                secondNodeClick = null;
+
         circle.style("stroke", function (o) {
-            return (o.Id == firstNodeClick.Id)? firstSelectNodeColor : default_border_color;
+            return isSelected(o, default_border_color)
         });
         text.style("font-weight", function (o) {
-            return isConnected(d, o) ? "bold" : "normal";
+            return (o.Id == firstNodeClick.Id) ? "bold" : "normal";
         });
     }
 }))
 //menu.append(new MenuItem({ type: 'separator' }))
 menu.append(new MenuItem({
     label: 'Select destiny', click() {
+
+        if (secondNodeClick != null) {
+            circle.style("stroke", function (o) {
+                return isConnected(o, default_border_color);
+            });
+            text.style("font-weight", function (o) {
+                return "normal";
+            });
+        }
+
         secondNodeClick = auxClickedNodeMenu;
+        if (firstNodeClick != null)
+            if (firstNodeClick.Id == secondNodeClick.Id)
+                firstNodeClick = null;
+
         circle.style("stroke", function (o) {
-            return (o.Id == secondNodeClick.Id)? secondSelectNodeColor : default_border_color;
+            return (o.Id == secondNodeClick.Id) ? secondSelectNodeColor : default_border_color;
         });
         text.style("font-weight", function (o) {
-            return isConnected(d, o) ? "bold" : "normal";
+            return (o.Id == secondNodeClick.Id) ? "bold" : "normal";
+        });
+    }
+}))
+
+menu.append(new MenuItem({
+
+
+    label: 'Remove flags', click() {
+        firstNodeClick = null;
+        secondNodeClick = null;
+        auxClickedNodeMenu = null;
+        circle.style("stroke", function (o) {
+            return default_border_color;
+        });
+        text.style("font-weight", function (o) {
+            return "normal";
         });
     }
 }))
@@ -83,16 +126,16 @@ async function exec() {
     //console.log(edges_value)
     //console.log("result: " + JSON.stringify(getNext(46, 40,JSON.parse(edges_value), [])))
     //console.log("result: " + JSON.stringify(getNext(40, 46,JSON.parse(edges_value), [])))
-    
+
     createGraph(assignPosition(JSON.parse(nodes_value)), JSON.parse(edges_value))
 }
 
 
 function getNext(source, destiny, edges, acum) {
-    
+
     for (var i = 0; i < edges.length; i++) {
-        console.log("compare "+edges[i]+" with source: "+source+" destiny "+destiny)
-        if (edges[i].source == source && edges[i].target == destiny ) { //aqui esta el problema
+        console.log("compare " + edges[i] + " with source: " + source + " destiny " + destiny)
+        if (edges[i].source == source && edges[i].target == destiny) { //aqui esta el problema
             console.log("finish")
             //acum.push({ "source": edges[i].source, "target": edges[i].target })
             acum[edges[i].source + "," + edges[i].target] = true
@@ -198,11 +241,10 @@ function createGraph(nodes_data, links_data) {
         .attr('class', 'nodes')
         .on("contextmenu", function (d, i) {
 
-            //console.log("item: "+JSON.stringify(d))
             d3.event.preventDefault();
-            auxLabel = d.Id;
-            console.log(auxLabel)
-            menu.popup({ value: 2, window: remote.getCurrentWindow() })
+            auxClickedNodeMenu = d;
+
+            menu.popup({ value: 3, window: remote.getCurrentWindow() })
 
             // react on right-clicking
         });
@@ -356,9 +398,11 @@ function exit_highlight() {
     if (focus_node === null) {
         g.style("cursor", "move");
         if (highlight_color != default_border_color) {
-            circle.style("stroke", default_border_color);
+            circle.style("stroke", function (o) { return isSelected(o, default_border_color) });
+            //return (o.Id == firstNodeClick.Id)? firstSelectNodeColor: default_border_color });
+            //
             text.style("font-weight", "normal");
-            link.style("stroke", function (o) { default_link_color });
+            link.style("stroke", function (o) { return isSelected(o, default_link_color) });
         }
 
     }
@@ -378,8 +422,9 @@ function set_focus(d) {
         return o.source.index == d.index || o.target.index == d.index ? 1 : highlight_trans;
     });
 
-
 }
+
+
 
 
 function set_highlight(d) {
@@ -388,7 +433,7 @@ function set_highlight(d) {
     highlight_node = d;
     if (highlight_color != default_border_color) {
         circle.style("stroke", function (o) {
-            return isConnected(d, o) ? highlight_color : default_border_color;
+            return isConnected(d, o) ? isSelected(o, highlight_color) : isSelected(o, default_border_color);
         });
         text.style("font-weight", function (o) {
             return isConnected(d, o) ? "bold" : "normal";
@@ -399,6 +444,21 @@ function set_highlight(d) {
         });
     }
 }
+
+function isSelected(a, color) {
+    if (firstNodeClick != null) {
+        if (a.Id == firstNodeClick.Id) {
+            return firstSelectNodeColor;
+        }
+    }
+    if (secondNodeClick != null) {
+        if (a.Id == secondNodeClick.Id) {
+            return secondSelectNodeColor;
+        }
+    }
+    return color;
+}
+
 function isConnected(a, b) {
     return linkedByIndex[(a.Id) + "," + (b.Id)] || linkedByIndex[(b.Id) + "," + (a.Id)] || a.Id == b.Id;
 }
@@ -438,11 +498,8 @@ let disabEnabEffect = function () {
 
     var checkBox = document.getElementById("checkEffect");
     if (checkBox.checked != true) {
-        node.on("mouseover", function (d) {
-        })
-            .on("mousedown", function (d) {
-            }).on("mouseout", function (d) {
-            });
+        node.on("mouseover", function (d) { })
+            .on("mousedown", function (d) { }).on("mouseout", function (d) { });
         toast({
             type: 'success',
             title: 'Graph effects disabled'

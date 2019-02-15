@@ -1,22 +1,44 @@
 {
   "name": "saam",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Graph",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "postinstall": "electron-builder install-app-deps",
+    "publish": "electron-builder -p always"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/sebospc/saam-telematica"
   },
-  "author": "Ospina Echavarria Shanchez",
-  "license": "ISC",
+  "author": {
+    "name": "grid",
+    "email": "pordefinir@def.com",
+    "url": "http://barnyrubble.tumblr.com/"
+  },
+  "contributors": [
+    {
+      "name": "Esteban Echavarria",
+      "email": "eechava6@eafit.edu.co"
+    },
+    {
+      "name": "Julian Andres Sanchez",
+      "email": "jsanch89@eafit.edu.co"
+    },
+    {
+      "name": "Sebastian Ospina",
+      "email": "sospin26@eafit.edu.co"
+    }
+  ],
   "dependencies": {
     "chart.js": "^2.7.2",
     "chroma-js": "^1.4.0",
     "d3": "^5.7.0",
-    "electron": "^2.0.8",
+    "electron-log": "^3.0.1",
+    "electron-updater": "^4.0.6",
     "grunt": "^1.0.3",
     "mongodb": "^3.1.9",
     "spinkit": "^1.2.5",
@@ -25,14 +47,31 @@
   },
   "build": {
     "appId": "com.example.saam",
+    "mac": {
+      "category": "your.app.category.type",
+      "target": [
+        "dmg"
+      ]
+    },
+    "win": {
+      "target": [
+        "nsins"
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    },
     "extraFiles": [
-      "server/Server.py"
-    ],
-    "extraResources": [
-      "server/*"
+      "server",
+      "Matlab",
+      "matlab_returns"
     ]
   },
   "devDependencies": {
-    "electron-builder": "^20.34.0"
+    "electron-builder": "^20.38.5",
+    "electron": "^2.0.17"
   }
 }
