@@ -1,3 +1,5 @@
+const requestCall = require("../../controllers/request");
+const { ipcRenderer } = require('electron');
 
 let toggleNavStatus = false;
 //nombre ,model{name,equalizerStatus:{}}
@@ -51,31 +53,8 @@ let addModificators = function () {
     if (result.value) {
 
 
-      if (collaborator != undefined || collaborator != "" ||   /\s/.test(collaborator )&& result.value  ) {
+      if (collaborator != undefined || collaborator != "" || /\s/.test(collaborator) && result.value) {
         collaborators.push(collaborator);
-        var MongoClient = require('mongodb').MongoClient;
-        var url = "mongodb://localhost:27017/";
-        MongoClient.connect(url,{useNewUrlParser: true}, function (err, db) {
-          if (err) {
-            throw err;
-          }
-          var dbo = db.db("saamdb");
-          dbo.collection("responsables").updateOne(
-            { usuario: userName },
-            { $push: { collaborators:collaborator } },
-            { 'upsert': true },
-            function (err, res) {
-              if (err) {
-                throw err;
-              }
-              db.close();
-            });
-        });
-        swal(
-          "Collaborator added successfull",
-          collaborator + " was added as collaborator!",
-          'success'
-        )
       }
     }
   })
@@ -92,7 +71,7 @@ let aboutUs = function () {
     background: ' rgba(255,255,255,0.9)',
     backdrop: `
       rgba(0,0,123,0.4)
-      url("../../resources/images/giphy.gif")
+      url("../../../resources/images/giphy.gif")
       center center
       repeat
     `
@@ -129,7 +108,10 @@ let exitOfModel = function () {
       swal(
         'Good Bye!',
         'We hope you will come back soon.',
-      ).then((result) => { window.close(); })
+      ).then(async (result) => {
+        await requestCall('GET', '/exit', {}, {})
+        ipcRenderer.send('close-me')
+      })
     }
   })
 
@@ -149,30 +131,11 @@ let logOut = function () {
       window.location.replace("../login/login.html")
     }
   })
-  
+
 
 }
 
 let getInfo = function () {
-  var MongoClient = require('mongodb').MongoClient;
-  var url = "mongodb://localhost:27017/";
-  MongoClient.connect(url,{useNewUrlParser: true}, function (err, db) {
-    if (err) throw err;
-    var dbo = db.db("saamdb");
-    dbo.collection('responsables', function (err, collection) {
-
-      collection.find({ usuario: userName },{"collaborators":1}).toArray(function (err, items) {
-        if (err) throw err;
-        swal({
-          title: 'Modeler : ' + name + " <br /> User : " + userName + " <br /> Model : Cooler",
-          text: "Collaborators : " + items[0]["collaborators"],
-
-        })
-        console.log(items[0]["collaborators"]);
-      });
-
-    });
-  });
-
 
 }
+  

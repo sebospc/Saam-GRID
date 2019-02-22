@@ -1,8 +1,6 @@
 const d3 = require("d3");
-const { remote } = require('electron')
-const { Menu, MenuItem } = remote
-
-
+const { remote } = require('electron');
+const { Menu, MenuItem } = remote;
 const width = screen.width;
 const height = screen.height;
 const radius = (width * 2) / 70;
@@ -32,6 +30,7 @@ var link;
 var linkedByIndex = {};
 var g = svg.append("g").attr("class", "everything");
 var drag_handler;
+var keysArr = [];
 
 
 var auxClickedNodeMenu;
@@ -111,24 +110,14 @@ menu.append(new MenuItem({
 }))
 
 
+init();
 
-
-
-exec();
-
-async function exec() {
-    nodes_value = await server.getNodes();
-    //nodes_value_copy = JSON.parse(nodes_value);
-
-    edges_value = await server.getEdges();
-    //edges_value_copy = JSON.parse(edges_value);
-
-    //console.log(edges_value)
-    //console.log("result: " + JSON.stringify(getNext(46, 40,JSON.parse(edges_value), [])))
-    //console.log("result: " + JSON.stringify(getNext(40, 46,JSON.parse(edges_value), [])))
-
-    createGraph(assignPosition(JSON.parse(nodes_value)), JSON.parse(edges_value))
+async function init() {
+    nodes = await requestCall('GET', '/getNodes', {}, {});
+    edges = await requestCall('GET', '/getEdges', {}, {})
+    createGraph(assignPosition(nodes), edges)
 }
+
 
 
 function getNext(source, destiny, edges, acum) {
@@ -297,7 +286,7 @@ function createGraph(nodes_data, links_data) {
     }
 
     function tickActions() {
-        node.attr('transform', d => `translate(${d.x},${d.y})`)
+        node.attr('transform', (d) => `translate(${d.x},${d.y})`)
 
         link.attr("x1", function (d) { return d.source.x; })
             .attr("y1", function (d) { return d.source.y; })
@@ -329,6 +318,7 @@ function assignPosition(nodes) {
     xPositionPerTypeLeft = { "xtype0": -radius, "xtype1": -radius, "xtype2": -radius, "xtype3": -radius }
     xPositionPerTypeRight = { "xtype0": radius, "xtype1": radius, "xtype2": radius, "xtype3": radius }
     nodes.forEach((item) => {
+
         item.fixed = "TRUE"
         left = false;
         if (Math.random() < 0.5)
@@ -343,6 +333,7 @@ function assignPosition(nodes) {
             }
             item.y = height;
         } else if (item.type == 1) {
+            keysArr.push(item.Label)
             if (left) {
                 item.x = xPositionPerTypeLeft.xtype1;
                 xPositionPerTypeLeft.xtype1 -= radius * 2;
@@ -524,7 +515,8 @@ let originalModel = function () {
         cancelButtonColor: '#d33',
         confirmButtonText: 'Yes, reset it!'
     }).then((result) => {
-        location.reload();
+        if (result.value)
+            location.reload();
     })
 }
 

@@ -29,7 +29,7 @@ def getEqualiserName(fileName):
     return (fileName[:str.find(fileName,"Equaliser")-1])
 
 def readequaliser(file):
-    #This reads files and creates .Jason object of the equalisers and send the .Json object like a socket
+    #This reads files and creates .Json object of the equalisers and send the .Json object like a socket
     #Project files
     equaData = []
     equaliserDoc = open(project + "/" + file, "r" )
