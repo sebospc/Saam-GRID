@@ -109,7 +109,6 @@ let exitOfModel = function () {
         'Good Bye!',
         'We hope you will come back soon.',
       ).then(async (result) => {
-        await requestCall('GET', '/exit', {}, {})
         ipcRenderer.send('close-me')
       })
     }

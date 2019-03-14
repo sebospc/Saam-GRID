@@ -1,5 +1,5 @@
 var env = process.env.NODE_ENV || 'test';
-const defaultPort = 3030;
+const defaultPort = 3000;
 
 var config = {
   development: {
@@ -12,7 +12,7 @@ var config = {
   },
   test: {
     port: process.env.PORT || defaultPort,
-    directionBack: "http://localhost",
+    directionBack: "https://sospin26.dis.eafit.edu.co",
     distributionFolder: 'generatedExecutableFolder',
     generatedBackendFiles: 'Matlab/DemoCooler2',//from matlab
     scriptsFolder: 'trayPy',

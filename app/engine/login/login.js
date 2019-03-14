@@ -3,6 +3,7 @@ const swal = require("sweetalert2");
 
 let logBool = false;
 let login = function () {
+    
     if (document.getElementById("inputName").value.length === 0 || document.getElementById("inputUser").value.length === 0 ||
         /\s/.test(document.getElementById("inputName").value) || /\s/.test(document.getElementById("inputUser").value)) {
         swal({
@@ -13,6 +14,7 @@ let login = function () {
         })
     } else {
         logBool = true;
+        window.location.replace('../main/main.html?name=' + document.getElementById("inputName").value + "&user=" + document.getElementById("inputUser").value);
     }
 
 }

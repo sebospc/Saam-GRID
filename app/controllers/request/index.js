@@ -1,6 +1,6 @@
-const sharedObj = require('electron').remote.getGlobal('sharedObj');
 
-const url = sharedObj.url;
+const config = require('../../../config');
+const url = config.directionBack
 
 function defaultRequest(typeRequest, methodName, headers, values, callback) {
     var http = new XMLHttpRequest();
