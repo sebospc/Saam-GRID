@@ -4,27 +4,15 @@ const defaultPort = 3000;
 var config = {
   development: {
     port: process.env.PORT || defaultPort,
-    directionBack: "http://localhost",
-    distributionFolder: 'generatedExecutableFolder',
-    generatedBackendFiles: 'Matlab/DemoCooler2',//from matlab
-    scriptsFolder: 'trayPy',
-    executableMainName: 'middleConnect'
+    directionBack: "http://localhost"
   },
   test: {
     port: process.env.PORT || defaultPort,
-    directionBack: "https://sospin26.dis.eafit.edu.co",
-    distributionFolder: 'generatedExecutableFolder',
-    generatedBackendFiles: 'Matlab/DemoCooler2',//from matlab
-    scriptsFolder: 'trayPy',
-    executableMainName: 'middleConnect'
+    directionBack: "https://sospin26.dis.eafit.edu.co"
   },
   production: {
     port: process.env.PORT || defaultPort,
-    directionBack: "http://localhost",
-    distributionFolder: 'generatedExecutableFolder',
-    generatedBackendFiles: 'Matlab/DemoCooler2',//from matlab
-    scriptsFolder: 'trayPy',
-    executableMainName: 'middleConnect'
+    directionBack: "http://localhost"
   }
 };
 

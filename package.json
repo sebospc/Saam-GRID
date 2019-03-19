@@ -37,14 +37,9 @@
     "chart.js": "^2.7.2",
     "chroma-js": "^1.4.0",
     "d3": "^5.7.0",
-    "electron-log": "^3.0.1",
     "electron-updater": "^4.0.6",
-    "grunt": "^1.0.3",
-    "portscanner": "^2.2.0",
-    "pouchdb": "^7.0.0",
-    "spinkit": "^1.2.5",
-    "sweetalert2": "^7.29.0",
-    "vis": "^4.21.0"
+    "sweetalert2": "^7.29.0"
+
   },
   "build": {
     "appId": "com.example.saam",

@@ -27,8 +27,11 @@ autoUpdater.logger.transports.file.level = 'info';
 let win
 function createWindow() {
 
-    win = new BrowserWindow({ show: false, frame: false })
-
+    win = new BrowserWindow({frame: false,
+        webPreferences: {
+            webSecurity: false
+        } })
+    app.commandLine.appendSwitch('ignore-certificate-errors');
     win.loadURL(url.format({
         pathname: path.join(__dirname, './app/engine/login/login.html'),
         protocol: 'file',
