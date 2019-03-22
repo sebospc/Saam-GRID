@@ -8,7 +8,8 @@ var config = {
   },
   test: {
     port: process.env.PORT || defaultPort,
-    directionBack: "https://sospin26.dis.eafit.edu.co"
+    directionBack: "https://sospin26.dis.eafit.edu.co",
+    env: env
   },
   production: {
     port: process.env.PORT || defaultPort,

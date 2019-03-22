@@ -4,7 +4,7 @@ const path = require('path');
 const url = require('url');
 const { autoUpdater } = require("electron-updater");
 const { ipcMain } = require('electron');
-
+const config = require('./config')
 
 
 
@@ -33,7 +33,8 @@ function createWindow() {
     
     win.once('ready-to-show', () => win.show)
 
-    autoUpdater.checkForUpdates();
+    if(config.env != 'test')
+        autoUpdater.checkForUpdates();
 }
 
 
@@ -63,9 +64,19 @@ autoUpdater.on('download-progress', (progressObj) => {
     log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
     sendStatusToWindow(log_message);
 })
-autoUpdater.on('update-downloaded', (info) => {
-    sendStatusToWindow('Update downloaded');
-});
+autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
+    const dialogOpts = {
+      type: 'info',
+      buttons: ['Restart', 'Later'],
+      title: 'Application Update',
+      message: process.platform === 'win32' ? releaseNotes : releaseName,
+      detail: 'A new version has been downloaded. Restart the application to apply the updates.'
+    }
+  
+    dialog.showMessageBox(dialogOpts, (response) => {
+      if (response === 0) autoUpdater.quitAndInstall()
+    })
+  })
 
 
 app.on('ready',createWindow)
