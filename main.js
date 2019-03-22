@@ -3,19 +3,9 @@ const { app, BrowserWindow } = electron;
 const path = require('path');
 const url = require('url');
 const { autoUpdater } = require("electron-updater");
-const log = require('electron-log');
-const config = require('./config');
 const { ipcMain } = require('electron');
-const PY_DIST_FOLDER = config.distributionFolder;
-const PY_FOLDER = config.scriptsFolder;
-const PY_MODULE = config.executableMainName;// without .py suffix
-const portscanner = require('portscanner');
-
-var serverProcess = null;
 
 
-autoUpdater.logger = log;
-autoUpdater.logger.transports.file.level = 'info';
 
 
 
@@ -33,7 +23,7 @@ function createWindow() {
         } })
     app.commandLine.appendSwitch('ignore-certificate-errors');
     win.loadURL(url.format({
-        pathname: path.join(__dirname, './app/engine/login/login.html'),
+        pathname: path.join(__dirname, './app/engine/main/main.html'),
         protocol: 'file',
         webPreferences: {
             devTools: true
@@ -43,7 +33,7 @@ function createWindow() {
     
     win.once('ready-to-show', () => win.show)
 
-    //autoUpdater.checkForUpdates();
+    autoUpdater.checkForUpdates();
 }
 
 
@@ -52,7 +42,7 @@ ipcMain.on('close-me', (evt, arg) => {
 })
 
 function sendStatusToWindow(text) {
-    log.info(text);
+    console.log(text)
 }
 
 autoUpdater.on('checking-for-update', () => {
