@@ -23,7 +23,7 @@ function createWindow() {
         } })
     app.commandLine.appendSwitch('ignore-certificate-errors');
     win.loadURL(url.format({
-        pathname: path.join(__dirname, './app/engine/main/main.html'),
+        pathname: path.join(__dirname, './app/engine/login/login.html'),
         protocol: 'file',
         webPreferences: {
             devTools: true
