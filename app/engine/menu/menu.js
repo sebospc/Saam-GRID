@@ -36,12 +36,14 @@ let toggleNav = function () {
 
   }
 }
-
-let addModificators = function () {
-  var collaborator;
+/**
+ * this function it's incomplete 
+ **/
+let addModificators = function(){ 
+ var collaborator;
   swal({
     title: 'Write collaborator name',
-    text: "Remember, collaborators can't be removed later, and their name have no white spaces",
+    text: "Remember the collaborator name must not have white spaces",
     input: 'text',
     inputValue: "",
     showCancelButton: true,
@@ -51,8 +53,6 @@ let addModificators = function () {
     }
   }).then((result) => {
     if (result.value) {
-
-
       if (collaborator != undefined || collaborator != "" || /\s/.test(collaborator) && result.value) {
         collaborators.push(collaborator);
       }
@@ -78,14 +78,21 @@ let aboutUs = function () {
   })
 }
 
-
-let undo = function () {
+/**
+ * to implement
+ */
+let undo = function () { 
   //server.undo();
   swal(
     'Undo successfull',
     'Equalizer was returned to previous values',
     'success')
 }
+
+/**
+ * to implement
+ */
+
 let redo = function () {
   //server.undo();
   swal(
@@ -93,6 +100,8 @@ let redo = function () {
     'Equalizer was returned to previous values',
     'success')
 }
+
+
 
 let exitOfModel = function () {
   swal({
@@ -134,7 +143,61 @@ let logOut = function () {
 
 }
 
+/**
+ * to imeplment
+ */
+
 let getInfo = function () {
 
 }
-  
+
+
+/**
+ * this function only reload the view
+ */
+let originalModel = function () {
+  swal({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, reset it!'
+  }).then((result) => {
+      if (result.value)
+          location.reload();
+  })
+}
+
+/**
+ * this function is consumed by the button change model
+ * inputOptions must be dynamic
+ * */
+let changeModel = function () {
+  swal({
+      title: 'Select new model',
+      input: 'select',
+      inputOptions: {
+          "Cooler": "Cooler"
+      },
+      inputPlaceholder: 'Select a model',
+      showCancelButton: true,
+      inputValidator: (value) => {
+          return new Promise((resolve) => {
+              if (value == "Cooler") {
+                  swal(
+                      'Model changed',
+                      'You changed to model "' + value + '"',
+                      'success'
+                  ).then((result) => {
+                      location.reload();
+                  })
+              }
+              return !value && resolve('Select a correct model')
+
+          })
+      }
+  })
+}
+

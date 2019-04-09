@@ -9,6 +9,10 @@ var modelName = "Cooler";
 
 var names = {}
 
+
+/**
+ * to implement
+ */
 function saveModel() {
     
 }

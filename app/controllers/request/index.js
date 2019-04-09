@@ -2,7 +2,7 @@
 const config = require('../../../config');
 const url = config.directionBack
 
-function defaultRequest(typeRequest, methodName, headers, values, callback) {
+function defaultRequest(typeRequest, methodName, headers, body, callback) {
     var http = new XMLHttpRequest();
     http.responseType = 'json';
     http.open(typeRequest, url + methodName, true);
@@ -15,7 +15,7 @@ function defaultRequest(typeRequest, methodName, headers, values, callback) {
             callback(http);
         }
     }
-    http.send(JSON.stringify(values))
+    http.send(JSON.stringify(body))
 }
 
 function xhrOwn(methodRequest, methodName, headers, values) {
