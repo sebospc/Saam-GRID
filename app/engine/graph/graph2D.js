@@ -4,7 +4,7 @@ const colors = require("nice-color-palettes")
 
 const width = screen.width;
 var height = screen.height;
-var radius = (width * 2) / 70;
+var radius = (width * 2) / 100;
 const linkWidth = radius / 10;
 const highlight_color = "#111"; //this color will be used when user clicks on one node.
 const default_link_color = "#888";
@@ -32,8 +32,7 @@ var linkedByIndex = {};
 var g = svg.append("g").attr("class", "everything");
 var drag_handler;
 var keysArr = [];
-var types = [];
-
+var zones = [];
 
 var firstNodeClick = null;
 var secondNodeClick = null;
@@ -44,31 +43,60 @@ class type {
     this.y1 = y1;
     this.y2 = y2;
     this.x = width / 2;
+    this.xLeft = this.x;
+    this.xRight = this.x;
     this.y = (y2 - y1) / 2 + y1;
-  }
-  getX() {
-    var value;
-    if (Math.random() < 0.5)
-      value = this.x -= radius * (2+(1*Math.random()));
-    else
-      value = this.x += radius * (2+(1*Math.random()));
-    if (value > radius && value < width-radius)
-      return value;
-    else
-      return this.x = width / 2;
+    this.yUp = this.y;
+    this.yDown = this.y;
+    this.left = true;
+    this.up = true;
   }
 
-  getY() {
+  getX(rad) {
     var value;
-    if (Math.random() < 0.5)
-      value = this.y -= radius * 2;
-    else
-      value = this.y += radius * 2;
-    if (value > this.y1+radius && value < this.y2-radius)
-      return value;
-    else
-      return this.y = (this.y2 - this.y1) / 2 + this.y1;
+    if (this.left) {
+      value = this.xLeft -= rad * 2;
+      this.left = false;
+      if (!(value > rad && value < width - rad))
+        value = this.xLeft = this.x;
+    } else {
+      value = this.xRight;
+      this.xRight += rad * 2;
+      this.left = true;
+      if (!(value > rad && value < width - rad))
+        value = this.xRight = this.x;
+    }
+
+
+    return value;
   }
+
+  getY(rad) {
+    var value;
+    if (this.up) {
+      value = this.yUp -= rad * 2;
+      this.up = false;
+      if (!(value > this.y1 + rad && value < this.y2 - rad))
+        value = this.yUp = this.y;
+    } else {
+      value = this.yDown += rad * 2;
+      this.up = true;
+      if (!(value > this.y1 + rad && value < this.y2 - rad))
+        value = this.yDown = this.y;
+
+
+    }
+
+    return this.y = (this.y2 - this.y1) / 2 + this.y1;
+  }
+
+  isContainedInx(x,rad){
+    return x > rad && x < width-rad;
+  }
+  isContainedIny(y,rad){
+    return y > this.y1+rad && y < this.y2-rad;
+  }
+
 }
 
 init();
@@ -78,7 +106,7 @@ async function init() {
   //nodes = await requestCall('GET', '/getNodes', {"fileName":"ejemplocooler_node","infoName":"infoCooler","variablesFileName":"Workbook1"}, {});
   edges = await requestCall('GET', '/getEdges', { "fileName": "SAPV_edge" }, {})
   //edges = await requestCall('GET', '/getEdges', {"fileName":"ejemplocooler_edge"}, {})
-  types = [0, 1, 2, 3];
+  var types = [0, 1, 2, 3];
 
   createGraph(assignPosition(nodes, types), edges);
 }
@@ -87,7 +115,7 @@ async function init() {
 function assignPosition(nodes, types) {
   const heightPerZone = height / types.length;
   var i = 0;
-  var zones = []
+  
   for (const num of types) {
     var y1 = (heightPerZone) * i + padding;
     g.append("rect")//relaciones
@@ -96,21 +124,29 @@ function assignPosition(nodes, types) {
       .attr("height", heightPerZone)
       .attr("width", width)
       .style('fill', colors[i][i % 4]);
-    zones.push(new type(y1,y1+heightPerZone ))
+    zones.push(new type(y1, y1 + heightPerZone))
     i++;
   }
-  
-  
-  nodes.forEach((item) =>{
-    var rad;
-    rad = ("" + item.Label).length * 4 + 10;
-    if(rad > radius)
-      radius = rad;
-  })
 
-  nodes.forEach((item) =>{
-    item.fx = zones[item.type].getX()
-    item.fy = zones[item.type].getY()
+
+  //nodes.forEach((item) =>{
+  //  var rad;
+  //  rad = ("" + item.Label).length * 4 + 10;
+  //  if(rad > radius)
+  //    radius = rad;
+  //})
+
+  nodes.forEach((item) => {
+    item.radius = (radius > ("" + item.Label).length * 4 + 10) ? radius : ("" + item.Label).length * 4 + 10;
+  });
+
+  nodes.forEach((item) => {
+    item.fx = zones[item.type].getX(item.radius)
+    item.fy = zones[item.type].getY(item.radius)
+
+    //keysArr is used to define the columns in the modal.js
+    if (item.type == 1)
+      keysArr.push(item.Label)
   })
   //(radius > ("" + d.Label).length * 4 + 10) ? radius : ("" + d.Label).length * 4 + 10;
   return nodes;
@@ -184,7 +220,7 @@ function createGraph(nodes_data, links_data) {
   circle = node.append('circle')
     .classed("svgCircleType0", true)
     .attr("r", function (d) {
-      return (radius > ("" + d.Label).length * 4 + 10) ? radius : ("" + d.Label).length * 4 + 10;
+      return d.radius;
     })
     .style("stroke-width", nominal_stroke)
     .style("stroke", default_border_color);
@@ -207,20 +243,26 @@ function createGraph(nodes_data, links_data) {
   //d is the node 
   function drag_start(d) {
     if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+    if(zones[d.type].isContainedInx(d3.event.x,d.radius))
     d.fx = d3.event.x;
+    if(zones[d.type].isContainedIny(d3.event.y,d.radius))
     d.fy = d3.event.y;
   }
 
   function drag_drag(d) {
+    if(zones[d.type].isContainedInx(d3.event.x,d.radius))
     d.fx = d3.event.x;
+    if(zones[d.type].isContainedIny(d3.event.y,d.radius))
     d.fy = d3.event.y;
   }
 
 
   function drag_end(d) {
     if (!d3.event.active) simulation.alphaTarget(0);
-    d.fx = d3.event.x;
-    d.fy = d3.event.y;
+      if(zones[d.type].isContainedInx(d3.event.x,d.radius))
+      d.fx = d3.event.x;
+      if(zones[d.type].isContainedIny(d3.event.y,d.radius))
+      d.fy = d3.event.y;
   }
 
   function tickActions() {
@@ -236,13 +278,17 @@ function createGraph(nodes_data, links_data) {
 
 
   zoom_handler = d3.zoom()
-    .scaleExtent([0.3, 3])
-    .translateExtent([[-width / 2, -height / 2], [width * 1.5, height * 1.5]])
+    .scaleExtent([1, 3])
+    .translateExtent([[0, padding], [width , height ]])
+    .extent([[0, padding], [width, height]])
     .on("zoom", zoom_actions);
 
   zoom_handler(svg);
 
+
+
   function zoom_actions() {
+    
     g.attr("transform", d3.event.transform)
   }
 
@@ -363,7 +409,7 @@ function highlight_from_routes(acum) {
 
 //this function is consumed by the button resize
 function resize() {
-  svg.transition().duration(200).ease(d3.easeLinear).call(zoom_handler.transform, d3.zoomIdentity.translate(300, 200).scale(0.6));
+  svg.transition().duration(200).ease(d3.easeLinear).call(zoom_handler.transform, d3.zoomIdentity.scale(1));
 }
 
 //this function is consumed by the toggle button
