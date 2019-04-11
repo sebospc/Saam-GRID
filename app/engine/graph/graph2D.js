@@ -102,10 +102,10 @@ class type {
 init();
 
 async function init() {
-  nodes = await requestCall('GET', '/getNodes', { "fileName": "SAPV_node", "infoName": "infoSAPV", "variablesFileName": "TraceabilityTree_SAPV" }, {});
-  //nodes = await requestCall('GET', '/getNodes', {"fileName":"ejemplocooler_node","infoName":"infoCooler","variablesFileName":"Workbook1"}, {});
-  edges = await requestCall('GET', '/getEdges', { "fileName": "SAPV_edge" }, {})
-  //edges = await requestCall('GET', '/getEdges', {"fileName":"ejemplocooler_edge"}, {})
+  //nodes = await requestCall('GET', '/getNodes', { "fileName": "SAPV_node", "infoName": "infoSAPV", "variablesFileName": "TraceabilityTree_SAPV" }, {});
+  nodes = await requestCall('GET', '/getNodes', {"fileName":"ejemplocooler_node","infoName":"infoCooler","variablesFileName":"Workbook1"}, {});
+  //edges = await requestCall('GET', '/getEdges', { "fileName": "SAPV_edge" }, {})
+  edges = await requestCall('GET', '/getEdges', {"fileName":"ejemplocooler_edge"}, {})
   var types = [0, 1, 2, 3];
 
   createGraph(assignPosition(nodes, types), edges);
