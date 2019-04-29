@@ -14,7 +14,8 @@ const highlight_trans = 0.1;
 const firstSelectNodeColor = "#FF5733";
 const secondSelectNodeColor = "#333FFF";
 const padding = 60;
-
+const horizontalPadding = 10;
+const verticalPadding = 3;
 
 var focus_node = null, highlight_node = null; //this variables will be used to occult the nodes.
 
@@ -32,17 +33,20 @@ var linkedByIndex = {};
 var g = svg.append("g").attr("class", "everything");
 var drag_handler;
 var keysArr = [];
-var zones = [];
+var zones = {};
 
 var firstNodeClick = null;
 var secondNodeClick = null;
-height -= padding;
+const visualHeight = height -padding
 
 class type {
-  constructor(y1, y2) {
+  constructor(x1,x2,y1, y2) {
     this.y1 = y1;
     this.y2 = y2;
-    this.x = width / 2;
+    this.x1 = x1;
+    this.x2 = x2;
+
+    this.x = (x2-x1)/2
     this.xLeft = this.x;
     this.xRight = this.x;
     this.y = (y2 - y1) / 2 + y1;
@@ -55,16 +59,19 @@ class type {
   getX(rad) {
     var value;
     if (this.left) {
-      value = this.xLeft -= rad * 2;
+      value = this.x1 + (this.xLeft -= rad * 2);
       this.left = false;
-      if (!(value > rad && value < width - rad))
+      //if (!(value > rad && value < width - rad))
+      if(!this.isContainedInx(value,rad))
         value = this.xLeft = this.x;
     } else {
-      value = this.xRight;
+      value = this.x1 + this.xRight;
       this.xRight += rad * 2;
       this.left = true;
-      if (!(value > rad && value < width - rad))
+      if(!this.isContainedInx(value,rad))
         value = this.xRight = this.x;
+      //if (!(value > rad && value < width - rad))
+        
     }
 
 
@@ -76,22 +83,22 @@ class type {
     if (this.up) {
       value = this.yUp -= rad * 2;
       this.up = false;
-      if (!(value > this.y1 + rad && value < this.y2 - rad))
+      //if (!(value > this.y1 + rad && value < this.y2 - rad))
+      if(!this.isContainedIny(value,rad))
         value = this.yUp = this.y;
     } else {
       value = this.yDown += rad * 2;
       this.up = true;
-      if (!(value > this.y1 + rad && value < this.y2 - rad))
+      //if (!(value > this.y1 + rad && value < this.y2 - rad))
+      if(!this.isContainedIny(value,rad))
         value = this.yDown = this.y;
-
-
     }
-
-    return this.y = (this.y2 - this.y1) / 2 + this.y1;
+    this.y = (this.y2 - this.y1) / 2 + this.y1;
+    return this.y ;//= (this.y2 - this.y1) / 2 + this.y1;
   }
 
   isContainedInx(x,rad){
-    return x > rad && x < width-rad;
+    return x > (rad+this.x1) && x < (this.x2-rad);
   }
   isContainedIny(y,rad){
     return y > this.y1+rad && y < this.y2-rad;
@@ -106,17 +113,17 @@ async function init() {
   nodes = await requestCall('GET', '/getNodes', {"fileName":"ejemplocooler_node","infoName":"infoCooler","variablesFileName":"Workbook1"}, {});
   //edges = await requestCall('GET', '/getEdges', { "fileName": "SAPV_edge" }, {})
   edges = await requestCall('GET', '/getEdges', {"fileName":"ejemplocooler_edge"}, {})
-  var types = [0, 1, 2, 3];
-
-  createGraph(assignPosition(nodes, types), edges);
+  var types = [0, 1, 2];
+  var subTypes = [3,4,5];
+  createGraph(assignPosition(nodes, types, subTypes), edges);
 }
 
 
-function assignPosition(nodes, types) {
-  const heightPerZone = height / types.length;
-  var i = 0;
+function assignPosition(nodes, types, subTypes) {
+  const heightPerZone = visualHeight / 4; // total sections 
+  var i = 1;
   
-  for (const num of types) {
+  types.forEach(function(num){
     var y1 = (heightPerZone) * i + padding;
     g.append("rect")//relaciones
       .attr("y", y1)
@@ -124,17 +131,33 @@ function assignPosition(nodes, types) {
       .attr("height", heightPerZone)
       .attr("width", width)
       .style('fill', colors[i][i % 4]);
-    zones.push(new type(y1, y1 + heightPerZone))
+    var y2 = y1 +  heightPerZone;
+    zones[num] = (new type(0,width,y1, y2))
     i++;
-  }
+    
+  });
 
+  y1 = padding; 
+  const widthPerZone = width / 3;
+  var j = 0;
+  subTypes.forEach(function(num){
+    var x1 = widthPerZone*j+horizontalPadding;
+    var x2 = widthPerZone-horizontalPadding;
+    g.append("rect")//relaciones
+      .attr("y", y1)
+      .attr("x", x1)
+      .attr("height", heightPerZone)
+      .attr("width", x2)
+      .style('fill', colors[i][i % 3]);
+      j++;
+    
+      
+    var y2 = y1 +  heightPerZone;
+    zones[num] = new type(x1,x1+x2,y1,y2);
+    
+  })
 
-  //nodes.forEach((item) =>{
-  //  var rad;
-  //  rad = ("" + item.Label).length * 4 + 10;
-  //  if(rad > radius)
-  //    radius = rad;
-  //})
+  
 
   nodes.forEach((item) => {
     item.radius = (radius > ("" + item.Label).length * 4 + 10) ? radius : ("" + item.Label).length * 4 + 10;
@@ -143,7 +166,8 @@ function assignPosition(nodes, types) {
   nodes.forEach((item) => {
     item.fx = zones[item.type].getX(item.radius)
     item.fy = zones[item.type].getY(item.radius)
-
+    
+    
     //keysArr is used to define the columns in the modal.js
     if (item.type == 1)
       keysArr.push(item.Label)
@@ -279,7 +303,7 @@ function createGraph(nodes_data, links_data) {
 
   zoom_handler = d3.zoom()
     .scaleExtent([1, 3])
-    .translateExtent([[0, padding], [width , height ]])
+    .translateExtent([[0,padding ], [width ,height ]])
     .extent([[0, padding], [width, height]])
     .on("zoom", zoom_actions);
 

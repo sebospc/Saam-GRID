@@ -33,8 +33,8 @@ function createWindow() {
     
     win.once('ready-to-show', () => win.show)
 
-    if(config.env != 'test')
-        autoUpdater.checkForUpdates();
+    //if(config.env != 'test')
+        //autoUpdater.checkForUpdates();
 }
 
 
