@@ -1,7 +1,3 @@
-
-
-const swal = require("sweetalert2");
-
 var collaborators  = [];
 var userName = getQueryVariable("user");
 var name = getQueryVariable("name");

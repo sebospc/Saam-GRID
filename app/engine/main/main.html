@@ -79,8 +79,25 @@
         </div>
 
     </div>
+    
+    <script>
+        const requestCall = require("../../controllers/request");
+        const d3 = require("d3");
+        const colors = require("nice-color-palettes");
+        const { ipcRenderer } = require('electron');
+        const swal = require("sweetalert2");
 
-
+        var models;
+        var keysArr = [];
+        var actualModel = ""; //Default Cooler
+        chargeModels();
+        async function chargeModels(){
+          models = await requestCall('GET', "/getModelsNames",{},{})
+          actualModel = Object.keys(models["names"])[0];
+          console.log("Acual "+ actualModel);
+          init();
+        }
+    </script>
     <script type="text/javascript" src="../menu/menu.js"></script> <!-- menu functionality -->
     <script type="text/javascript" src="../modal/modal.js"></script>
     <script type="text/javascript" src="main.js"></script>

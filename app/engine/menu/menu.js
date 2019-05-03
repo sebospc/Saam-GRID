@@ -1,8 +1,12 @@
-const requestCall = require("../../controllers/request");
-const { ipcRenderer } = require('electron');
+
+
 
 let toggleNavStatus = false;
 //nombre ,model{name,equalizerStatus:{}}
+
+
+
+
 let toggleNav = function () {
   let getSidebar = document.querySelector(".nav-sidebar");
   let getSidebarUl = document.querySelector(".nav-sidebar ul");
@@ -174,27 +178,36 @@ let originalModel = function () {
  * this function is consumed by the button change model
  * inputOptions must be dynamic
  * */
-let changeModel = function () {
+let changeModel = async function () {
+
+  
+  
+  console.log("models: "+models)
   swal({
       title: 'Select new model',
       input: 'select',
-      inputOptions: {
-          "Cooler": "Cooler"
-      },
+      inputOptions: models["names"],
       inputPlaceholder: 'Select a model',
       showCancelButton: true,
       inputValidator: (value) => {
           return new Promise((resolve) => {
-              if (value == "Cooler") {
-                  swal(
-                      'Model changed',
-                      'You changed to model "' + value + '"',
-                      'success'
-                  ).then((result) => {
-                      location.reload();
-                  })
+              if (value == "" || value == undefined) 
+                return !value && resolve('Select a correct model')
+              console.log("value; "+value);
+              
+              if( actualModel != value){
+                actualModel = value;
+                swal(
+                        'Model changed',
+                        'You changed to model "' + value + '"',
+                        'success'
+                    ).then((result) => {
+                      svg.selectAll("*").remove();
+                      init();
+                    })
               }
-              return !value && resolve('Select a correct model')
+              
+              
 
           })
       }

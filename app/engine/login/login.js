@@ -1,5 +1,3 @@
-const swal = require("sweetalert2");
-
 
 let logBool = false;
 let login = function () {

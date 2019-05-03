@@ -1,5 +1,4 @@
-const d3 = require("d3");
-const colors = require("nice-color-palettes")
+
 
 
 const width = screen.width;
@@ -21,18 +20,16 @@ var focus_node = null, highlight_node = null; //this variables will be used to o
 
 
 
-var svg = d3.select('svg')
-  .attr("width", width)
-  .attr("height", height);
+var svg;
 var zoom_handler;
 var node;
 var circle;
 var text;
 var link;
 var linkedByIndex = {};
-var g = svg.append("g").attr("class", "everything");
+var g;
 var drag_handler;
-var keysArr = [];
+
 var zones = {};
 
 var firstNodeClick = null;
@@ -106,13 +103,19 @@ class type {
 
 }
 
-init();
+
 
 async function init() {
-  //nodes = await requestCall('GET', '/getNodes', { "fileName": "SAPV_node", "infoName": "infoSAPV", "variablesFileName": "TraceabilityTree_SAPV" }, {});
-  nodes = await requestCall('GET', '/getNodes', {"fileName":"ejemplocooler_node","infoName":"infoCooler","variablesFileName":"Workbook1"}, {});
-  //edges = await requestCall('GET', '/getEdges', { "fileName": "SAPV_edge" }, {})
-  edges = await requestCall('GET', '/getEdges', {"fileName":"ejemplocooler_edge"}, {})
+
+  svg = d3.select('svg')
+  .attr("width", width)
+  .attr("height", height);
+  
+  g = svg.append("g").attr("class", "everything");
+  nodes = await requestCall('GET', '/getNodes', models["models"][actualModel]["nodes"], {});
+  //nodes = await requestCall('GET', '/getNodes', {"fileName":"ejemplocooler_node","infoName":"infoCooler","variablesFileName":"Workbook1"}, {});
+  edges = await requestCall('GET', '/getEdges', models["models"][actualModel]["edges"], {})
+  //edges = await requestCall('GET', '/getEdges', {"fileName":"ejemplocooler_edge"}, {})
   var types = [0, 1, 2];
   var subTypes = [3,4,5];
   createGraph(assignPosition(nodes, types, subTypes), edges);

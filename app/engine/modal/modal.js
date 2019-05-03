@@ -13,7 +13,6 @@ var gap;
 var start;
 var end;
 
-
 gap = (screen.width * 0.382) * 0.023
 output.setAttributeNS(null, "y1", 0)
 output.setAttributeNS(null, "y2", 999)
@@ -174,7 +173,11 @@ getEqBttn.onclick = function () {
         confirmButtonText: 'Yes, get new equalizer!'
     }).then(async (result) => {
         if (result.value) {
-            
+            swal(
+                'Petition Send',
+                'The petition for a new equalizer was sent',
+                'success'
+            )
             var result = await requestCall( 'POST', '/updateEqualiser',{}, {name: eqName.innerText, value: actualVal.innerText} );
             
             console.log("result: "+result)
@@ -182,11 +185,7 @@ getEqBttn.onclick = function () {
             console.log("actualVal: " + actualVal.innerText)
             names[eqName.innerText] = actualVal.innerText;
             modal.style.display = 'none';
-            swal(
-                'Petition Send',
-                'The petition for a new equalizer was sent to MatLab',
-                'success'
-            )
+            
         }
     })
 
