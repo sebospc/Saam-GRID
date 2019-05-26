@@ -1,6 +1,3 @@
-
-
-
 let toggleNavStatus = false;
 //nombre ,model{name,equalizerStatus:{}}
 
@@ -202,7 +199,7 @@ let changeModel = async function () {
                         'You changed to model "' + value + '"',
                         'success'
                     ).then((result) => {
-                      svg.selectAll("*").remove();
+                      d3.selectAll('svg > g > *').remove();
                       init();
                     })
               }

@@ -3,7 +3,7 @@
 
 const width = screen.width;
 var height = screen.height;
-var radius = (width * 2) / 100;
+var radius = (width + height) / 70;
 const linkWidth = radius / 10;
 const highlight_color = "#111"; //this color will be used when user clicks on one node.
 const default_link_color = "#888";
@@ -15,6 +15,8 @@ const secondSelectNodeColor = "#333FFF";
 const padding = 60;
 const horizontalPadding = 10;
 const verticalPadding = 3;
+const coeffMovement = 5;
+const scaleText = radius / 2; //Defualt scale text
 
 var focus_node = null, highlight_node = null; //this variables will be used to occult the nodes.
 
@@ -34,16 +36,16 @@ var zones = {};
 
 var firstNodeClick = null;
 var secondNodeClick = null;
-const visualHeight = height -padding
+const visualHeight = height - padding
 
 class type {
-  constructor(x1,x2,y1, y2) {
+  constructor(x1, x2, y1, y2) {
     this.y1 = y1;
     this.y2 = y2;
     this.x1 = x1;
     this.x2 = x2;
 
-    this.x = (x2-x1)/2
+    this.x = (x2 - x1) / 2
     this.xLeft = this.x;
     this.xRight = this.x;
     this.y = (y2 - y1) / 2 + y1;
@@ -59,16 +61,16 @@ class type {
       value = this.x1 + (this.xLeft -= rad * 2);
       this.left = false;
       //if (!(value > rad && value < width - rad))
-      if(!this.isContainedInx(value,rad))
-        value = this.xLeft = this.x;
+      if (!this.isContainedInx(value, rad))
+        value = this.xLeft = (this.x + this.x1);
     } else {
       value = this.x1 + this.xRight;
       this.xRight += rad * 2;
       this.left = true;
-      if(!this.isContainedInx(value,rad))
-        value = this.xRight = this.x;
+      if (!this.isContainedInx(value, rad))
+        value = this.xRight = (this.x + this.x1);
       //if (!(value > rad && value < width - rad))
-        
+
     }
 
 
@@ -81,52 +83,56 @@ class type {
       value = this.yUp -= rad * 2;
       this.up = false;
       //if (!(value > this.y1 + rad && value < this.y2 - rad))
-      if(!this.isContainedIny(value,rad))
+      if (!this.isContainedIny(value, rad))
         value = this.yUp = this.y;
     } else {
       value = this.yDown += rad * 2;
       this.up = true;
       //if (!(value > this.y1 + rad && value < this.y2 - rad))
-      if(!this.isContainedIny(value,rad))
+      if (!this.isContainedIny(value, rad))
         value = this.yDown = this.y;
     }
     this.y = (this.y2 - this.y1) / 2 + this.y1;
-    return this.y ;//= (this.y2 - this.y1) / 2 + this.y1;
+    return this.y;//= (this.y2 - this.y1) / 2 + this.y1;
   }
 
-  isContainedInx(x,rad){
-    return x > (rad+this.x1) && x < (this.x2-rad);
+  isContainedInx(x, rad) {
+    return x > (rad + this.x1) && x < (this.x2 - rad);
   }
-  isContainedIny(y,rad){
-    return y > this.y1+rad && y < this.y2-rad;
+  isContainedIny(y, rad) {
+    return y > this.y1 + rad && y < this.y2 - rad;
   }
 
 }
+
+svg = d3.select('svg')
+  .attr("width", width)
+  .attr("height", height);
+
+g = svg.append("g").attr("class", "everything")
 
 
 
 async function init() {
 
-  svg = d3.select('svg')
-  .attr("width", width)
-  .attr("height", height);
-  
-  g = svg.append("g").attr("class", "everything");
+
   nodes = await requestCall('GET', '/getNodes', models["models"][actualModel]["nodes"], {});
   //nodes = await requestCall('GET', '/getNodes', {"fileName":"ejemplocooler_node","infoName":"infoCooler","variablesFileName":"Workbook1"}, {});
   edges = await requestCall('GET', '/getEdges', models["models"][actualModel]["edges"], {})
   //edges = await requestCall('GET', '/getEdges', {"fileName":"ejemplocooler_edge"}, {})
   var types = [0, 1, 2];
-  var subTypes = [3,4,5];
+  var subTypes = [3, 4, 5];
   createGraph(assignPosition(nodes, types, subTypes), edges);
 }
+
+
 
 
 function assignPosition(nodes, types, subTypes) {
   const heightPerZone = visualHeight / 4; // total sections 
   var i = 1;
-  
-  types.forEach(function(num){
+
+  types.forEach(function (num) {
     var y1 = (heightPerZone) * i + padding;
     g.append("rect")//relaciones
       .attr("y", y1)
@@ -134,43 +140,50 @@ function assignPosition(nodes, types, subTypes) {
       .attr("height", heightPerZone)
       .attr("width", width)
       .style('fill', colors[i][i % 4]);
-    var y2 = y1 +  heightPerZone;
-    zones[num] = (new type(0,width,y1, y2))
+    var y2 = y1 + heightPerZone;
+    zones[num] = (new type(0, width, y1, y2))
     i++;
-    
+
   });
 
-  y1 = padding; 
+  y1 = padding;
   const widthPerZone = width / 3;
   var j = 0;
-  subTypes.forEach(function(num){
-    var x1 = widthPerZone*j+horizontalPadding;
-    var x2 = widthPerZone-horizontalPadding;
+  subTypes.forEach(function (num) {
+    var x1 = widthPerZone * j + horizontalPadding;
+    var x2 = widthPerZone - horizontalPadding;
     g.append("rect")//relaciones
       .attr("y", y1)
       .attr("x", x1)
       .attr("height", heightPerZone)
       .attr("width", x2)
       .style('fill', colors[i][i % 3]);
-      j++;
-    
-      
-    var y2 = y1 +  heightPerZone;
-    zones[num] = new type(x1,x1+x2,y1,y2);
-    
+    j++;
+
+
+    var y2 = y1 + heightPerZone;
+    zones[num] = new type(x1, x1 + x2, y1, y2);
+
   })
 
-  
+
 
   nodes.forEach((item) => {
-    item.radius = (radius > ("" + item.Label).length * 4 + 10) ? radius : ("" + item.Label).length * 4 + 10;
+    maxRadius = 0;
+    array = item.Label.split(" ");
+    array.forEach(function(element){
+      if((element.length * 4 + 10) > maxRadius)
+        maxRadius = element.length * 4 + 10
+    })
+    
+    item.radius = maxRadius;
   });
 
   nodes.forEach((item) => {
     item.fx = zones[item.type].getX(item.radius)
     item.fy = zones[item.type].getY(item.radius)
-    
-    
+
+
     //keysArr is used to define the columns in the modal.js
     if (item.type == 1)
       keysArr.push(item.Label)
@@ -221,7 +234,7 @@ function createGraph(nodes_data, links_data) {
   drag_handler = d3.drag()
     .on("start", drag_start)
     .on("drag", drag_drag)
-    .on("end", drag_end);
+  //.on("end", drag_end);
 
 
   simulation.force("charge_force", charge_force)
@@ -256,9 +269,18 @@ function createGraph(nodes_data, links_data) {
   //Assign text to each node.
   text = node.append("text")
     .attr("text-anchor", "middle")
-    .text(function (d) {
-      return d.Label;
-    }).style('fill', 'rgb(50,50,50)');
+    .html(function (d) {
+      array = d.Label.split(" ");
+      head = array[0];
+      tail = array.slice(1);
+      label = head;
+      tail.forEach(function(element){
+        label += "<tspan x=0 dy=16 >" + element + "</tspan>"
+      })
+      return label;
+    }).style('fill', 'rgb(50,50,50)')
+    
+
 
 
 
@@ -268,27 +290,50 @@ function createGraph(nodes_data, links_data) {
 
   //drag handler
   //d is the node 
+  var currentX, currentY;
   function drag_start(d) {
+
     if (!d3.event.active) simulation.alphaTarget(0.3).restart();
-    if(zones[d.type].isContainedInx(d3.event.x,d.radius))
-    d.fx = d3.event.x;
-    if(zones[d.type].isContainedIny(d3.event.y,d.radius))
-    d.fy = d3.event.y;
+    currentX = d.x;
+    currentY = d.y;
   }
 
   function drag_drag(d) {
-    if(zones[d.type].isContainedInx(d3.event.x,d.radius))
-    d.fx = d3.event.x;
-    if(zones[d.type].isContainedIny(d3.event.y,d.radius))
-    d.fy = d3.event.y;
+
+    if (zones[d.type].isContainedInx(d3.event.x, d.radius)) {
+      d.fx = d3.event.x;
+    } else if (d3.event.x - currentX < 0) { // move to left
+      if (zones[d.type].isContainedInx(d.fx - coeffMovement, d.radius))
+        d.fx -= coeffMovement;
+    } else if (d3.event.x - currentX > 0) { // move to right
+      if (zones[d.type].isContainedInx(d.fx + coeffMovement, d.radius))
+        d.fx += coeffMovement;
+    }
+
+    if (zones[d.type].isContainedIny(d3.event.y, d.radius)) {
+      d.fy = d3.event.y;
+    } else if (d3.event.y - currentY < 0) { // move to up
+      if (zones[d.type].isContainedIny(d.fy - coeffMovement, d.radius)) {
+        d.fy -= coeffMovement;
+      }
+
+    } else if (d3.event.y - currentY > 0) { // move to down
+      if (zones[d.type].isContainedIny(d.fy + coeffMovement, d.radius)) {
+
+        d.fy += coeffMovement;
+      }
+
+    }
+    currentX = d.fx;
+    currentY = d.fy;
   }
 
 
   function drag_end(d) {
     if (!d3.event.active) simulation.alphaTarget(0);
-      if(zones[d.type].isContainedInx(d3.event.x,d.radius))
+    if (zones[d.type].isContainedInx(d3.event.x, d.radius))
       d.fx = d3.event.x;
-      if(zones[d.type].isContainedIny(d3.event.y,d.radius))
+    if (zones[d.type].isContainedIny(d3.event.y, d.radius))
       d.fy = d3.event.y;
   }
 
@@ -306,7 +351,7 @@ function createGraph(nodes_data, links_data) {
 
   zoom_handler = d3.zoom()
     .scaleExtent([1, 3])
-    .translateExtent([[0,padding ], [width ,height ]])
+    .translateExtent([[0, padding], [width, height]])
     .extent([[0, padding], [width, height]])
     .on("zoom", zoom_actions);
 
@@ -315,7 +360,7 @@ function createGraph(nodes_data, links_data) {
 
 
   function zoom_actions() {
-    
+
     g.attr("transform", d3.event.transform)
   }
 
@@ -464,5 +509,4 @@ let disabEnabEffect = function () {
     assignEffectOfClick();
   }
 }
-
 

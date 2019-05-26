@@ -31,7 +31,7 @@ async function openModal(name) {
     var ctx = document.getElementById("myChart").getContext('2d');
     var myChart = new Chart(ctx, null)
     myChart.destroy()
-    var aux = await requestCall( 'GET', '/getEqualiser',{}, {} );
+    var aux = await requestCall( 'GET', '/getEqualiser',{"folder": actualModel}, {} );
     var names = aux["values"];
 
     var auxData = aux[name];
