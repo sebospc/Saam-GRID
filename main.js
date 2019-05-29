@@ -4,7 +4,7 @@ const path = require('path');
 const url = require('url');
 const { autoUpdater } = require("electron-updater");
 const { ipcMain } = require('electron');
-const config = require('./config')
+
 
 
 
@@ -16,7 +16,7 @@ const config = require('./config')
 
 let win
 function createWindow() {
-
+    
     win = new BrowserWindow({frame: false,
         webPreferences: {
             webSecurity: false

@@ -22,25 +22,30 @@
 
         <li><a href="#" style="position: absolute; right: 0%; width: 14%; ">
                 <label style="padding: 10px">Effects </label>
-            
-                
-            <label class="switch">
-            <input type="checkbox" id="checkEffect" checked onclick="disabEnabEffect()">
-            <span class="slider round"></span>
-            </label></li></a>
+
+
+                <label class="switch">
+                    <input type="checkbox" id="checkEffect" checked onclick="disabEnabEffect()">
+                    <span class="slider round"></span>
+                </label></li></a>
     </ul>
 </nav>
 <aside class="nav-sidebar">
     <ul>
         <li><span><i class="fa fa-cogs" aria-hidden="true"></i> Settings</span></li>
-        <li><a href="#" onclick="addModificators()"><i class="fa fa-users" aria-hidden="true"></i> Add collaborator</a></li>
-        <li><a href="#" onclick="changeModel()"><i class="fa fa-area-chart" aria-hidden="true"></i> Change model</a></li>
-        <li><a href="#" onclick="originalModel()"><i class="fa fa-window-restore" aria-hidden="true"></i> Reset model</a></li>
+        <li><a href="#" onclick="addModificators()"><i class="fa fa-users" aria-hidden="true"></i> Add collaborator</a>
+        </li>
+        <li><a href="#" onclick="changeModel()"><i class="fa fa-area-chart" aria-hidden="true"></i> Change model</a>
+        </li>
+        <li><a href="#" onclick="originalModel()"><i class="fa fa-window-restore" aria-hidden="true"></i> Reset
+                model</a></li>
         <li><a href="#" onclick="aboutUs()" style="bottom:0%;position:absolute;"><i class="fa fa-envelope-open"
                     aria-hidden="true"></i> About us</a></li>
-        <li><a href="#" onclick="logOut()" style="bottom:8%;position: absolute;"><i class="fa fa-sign-out" aria-hidden="true"></i>
+        <li><a href="#" onclick="logOut()" style="bottom:8%;position: absolute;"><i class="fa fa-sign-out"
+                    aria-hidden="true"></i>
                 Sign out</a></li>
-        <li><a href="#" onclick="getInfo()" style="bottom:16%;position: absolute;"><i class="fa fa-info" aria-hidden="true"></i>
+        <li><a href="#" onclick="getInfo()" style="bottom:16%;position: absolute;"><i class="fa fa-info"
+                    aria-hidden="true"></i>
                 Model info</a></li>
     </ul>
 </aside>
@@ -61,7 +66,7 @@
 
     <div id="simpleModal" class="modal">
 
-        <div class="modal-content">
+        <div id="contentModal" class="modal-content">
             <label id="actualChar" class="labelChar"></label>
             <div class="slidecontainer">
                 <input type="range" min="0" max="100" value="0" class="slider2" id="rangeSlider">
@@ -71,7 +76,7 @@
             </div>
             <canvas id="myChart" width="500" height="500" class="chartCanvas"></canvas>
             <form>
-                Set value: <input type="text" id="expected" >
+                Set value: <input type="text" id="expected">
                 <button type="button" id="setBttn">Set</button><br>
                 Actual value: <label id="actual" class="label"> 0</label>
                 <button type="button" id="getEqBttn">Get Equalizer</button>
@@ -79,23 +84,35 @@
         </div>
 
     </div>
-    
+
     <script>
         const requestCall = require("../../controllers/request");
         const d3 = require("d3");
-        const colors = require("nice-color-palettes");
-        const { ipcRenderer } = require('electron');
+        const colors = ["#D6EAF8", "#E8DAEF", "#D4EFDF", "#FCF3CF", "#F6DDCC", "#EBDEF0"]
+        const { ipcRenderer, remote } = require('electron');
         const swal = require("sweetalert2");
+        const Chart = require("chart.js")
+        var myChart;
 
         var models;
         var keysArr = [];
         var actualModel = ""; //Default Cooler
+        var ctx = document.getElementById("myChart").getContext('2d');
+        var myChart = new Chart(ctx, null)
         chargeModels();
-        async function chargeModels(){
-          models = await requestCall('GET', "/getModelsNames",{},{})
-          actualModel = Object.keys(models["names"])[0];
-          console.log("Acual "+ actualModel);
-          init();
+        async function chargeModels() {
+            models = await requestCall('GET', "/getModelsNames", {}, {})
+            console.log("remote model"+localStorage.getItem( "actualModel" ));
+            if(!localStorage.getItem( "actualModel" )){
+               actualModel = Object.keys(models["names"])[0];
+               localStorage.setItem( "actualModel", actualModel );
+            }else{
+                actualModel = localStorage.getItem( "actualModel" );
+            }
+            console.log("actual model: "+actualModel)
+            
+            
+            init();
         }
     </script>
     <script type="text/javascript" src="../menu/menu.js"></script> <!-- menu functionality -->

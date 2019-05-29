@@ -28,9 +28,6 @@ window.addEventListener('click', outsideClick);
 
 // Function to open modal
 async function openModal(name) {
-    var ctx = document.getElementById("myChart").getContext('2d');
-    var myChart = new Chart(ctx, null)
-    myChart.destroy()
     var aux = await requestCall( 'GET', '/getEqualiser',{"folder": actualModel}, {} );
     var names = aux["values"];
 
@@ -38,7 +35,7 @@ async function openModal(name) {
     
     if (auxData == null) {
         modal.style.display = 'none';
-        return null;
+        return false;
     }
     document.getElementById('actualChar').innerText = name;
     var data = transpose(auxData)
@@ -82,16 +79,14 @@ async function openModal(name) {
     }
     dataSets.unshift({ "data": fixArr, "backgroundColor": color[0], "borderWitdth": 1 })
     modal.style.display = 'block';
-    var graph = new makeGraph(keysArr, dataSets, start, end);
+    makeGraph(keysArr, dataSets, start, end);
+    return true;
 }
 
 // Function to close modal if outside click
 function outsideClick(e) {
     if (e.target == modal) {
         modal.style.display = 'none';
-        var ctx = document.getElementById("myChart").getContext('2d');
-        var myChart = new Chart(ctx, null)
-        myChart.destroy()
     }
 }
 

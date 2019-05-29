@@ -177,8 +177,8 @@ let originalModel = function () {
  * */
 let changeModel = async function () {
 
-  
-  
+  var ctx = document.getElementById("myChart").getContext('2d');
+  ctx.innerHTML = ""
   console.log("models: "+models)
   swal({
       title: 'Select new model',
@@ -193,14 +193,13 @@ let changeModel = async function () {
               console.log("value; "+value);
               
               if( actualModel != value){
-                actualModel = value;
+                localStorage.setItem("actualModel",value)
                 swal(
                         'Model changed',
                         'You changed to model "' + value + '"',
                         'success'
                     ).then((result) => {
-                      d3.selectAll('svg > g > *').remove();
-                      init();
+                      location.reload();
                     })
               }
               

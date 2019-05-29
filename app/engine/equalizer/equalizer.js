@@ -1,10 +1,12 @@
-const Chart = require("chart.js")
+
 Chart.defaults.global.defaultFontColor = 'black';
 Chart.defaults.global.defaultFontSize = '11';
 function makeGraph(keys,dataSets,start,end){
     console.log(start)
-    var ctx = document.getElementById("myChart").getContext('2d');
-    var myChart = new Chart(ctx, {
+    if(myChart)
+        myChart.destroy()
+        
+    myChart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: keys,

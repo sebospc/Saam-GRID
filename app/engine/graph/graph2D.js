@@ -114,7 +114,7 @@ g = svg.append("g").attr("class", "everything")
 
 
 async function init() {
-
+  
 
   nodes = await requestCall('GET', '/getNodes', models["models"][actualModel]["nodes"], {});
   //nodes = await requestCall('GET', '/getNodes', {"fileName":"ejemplocooler_node","infoName":"infoCooler","variablesFileName":"Workbook1"}, {});
@@ -139,7 +139,7 @@ function assignPosition(nodes, types, subTypes) {
       .attr("x", 0)
       .attr("height", heightPerZone)
       .attr("width", width)
-      .style('fill', colors[i][i % 4]);
+      .style('fill', colors[i]);
     var y2 = y1 + heightPerZone;
     zones[num] = (new type(0, width, y1, y2))
     i++;
@@ -157,7 +157,7 @@ function assignPosition(nodes, types, subTypes) {
       .attr("x", x1)
       .attr("height", heightPerZone)
       .attr("width", x2)
-      .style('fill', colors[i][i % 3]);
+      .style('fill', colors[i]);
     j++;
 
 
@@ -169,7 +169,7 @@ function assignPosition(nodes, types, subTypes) {
 
 
   nodes.forEach((item) => {
-    maxRadius = 0;
+    maxRadius = radius;
     array = item.Label.split(" ");
     array.forEach(function(element){
       if((element.length * 4 + 10) > maxRadius)
@@ -189,6 +189,9 @@ function assignPosition(nodes, types, subTypes) {
       keysArr.push(item.Label)
   })
   //(radius > ("" + d.Label).length * 4 + 10) ? radius : ("" + d.Label).length * 4 + 10;
+  nodes.sort(function(a,b){
+    b.radius-a.radius
+  })
   return nodes;
 }
 
@@ -387,7 +390,18 @@ function assignEffectOfClick() {
     }).on("mouseout", function (d) {
       exit_highlight();
     });
-  node.on("click", function (d) { d3.event.stopPropagation(); openModal(d.Label) });
+  node.on("click", async function (d) { 
+    d3.event.stopPropagation(); 
+    bol = await openModal(d.Label)
+    console.log("bol: "+bol);
+    
+    if(!bol){
+      console.log("label doesn't exist")
+      swal({
+        title: d.Label,
+        text: "algo"
+      })
+    } });
   drag_handler(node);
 }
 
