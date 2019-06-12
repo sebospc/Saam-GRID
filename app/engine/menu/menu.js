@@ -40,8 +40,8 @@ let toggleNav = function () {
 /**
  * this function it's incomplete 
  **/
-let addModificators = function(){ 
- var collaborator;
+let addModificators = function () {
+  var collaborator;
   swal({
     title: 'Write collaborator name',
     text: "Remember the collaborator name must not have white spaces",
@@ -82,7 +82,7 @@ let aboutUs = function () {
 /**
  * to implement
  */
-let undo = function () { 
+let undo = function () {
   //server.undo();
   swal(
     'Undo successfull',
@@ -144,6 +144,26 @@ let logOut = function () {
 
 }
 
+let changeServer = function () {
+  actualServer = localStorage.getItem("server");
+  swal({
+    title: 'Write new server url',
+    text: "Actual server: " + actualServer,
+    input: 'text',
+    inputValue: "",
+    showCancelButton: true,
+    inputValidator: (value) => {
+      return !value && 'You need to write something!'
+    }
+  }).then((result) => {
+    console.log()
+    if (result.value) {
+      localStorage.setItem("server",result.value);
+    }
+  })
+}
+
+
 /**
  * to imeplment
  */
@@ -158,17 +178,46 @@ let getInfo = function () {
  */
 let originalModel = function () {
   swal({
+    title: 'Are you sure?',
+    text: "You won't be able to revert this!",
+    type: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Yes, reset it!'
+  }).then(async function (result) {
+    if (result.value){
+      
+      await requestCall( 'GET', '/resetEqualiser',{"folder": actualModel, "username": localStorage.getItem("username")}, {} );
+
+      location.reload();
+    }
+  })
+}
+
+
+let saveModel = async function(){
+  if(eqValues != undefined){
+    swal({
       title: 'Are you sure?',
       text: "You won't be able to revert this!",
       type: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, reset it!'
-  }).then((result) => {
+      confirmButtonText: 'Yes'
+    }).then(async function (result) {
       if (result.value)
-          location.reload();
-  })
+        await requestCall( 'POST', '/saveModel',{}, {username: localStorage.getItem("username"), model: actualModel, equaliser: eqValues });     
+    })
+  }else{
+    swal({
+      title: 'Error',
+      text: "Equaliser is empty",
+      type: 'warning',
+    })
+  }
+  
 }
 
 /**
@@ -179,34 +228,40 @@ let changeModel = async function () {
 
   var ctx = document.getElementById("myChart").getContext('2d');
   ctx.innerHTML = ""
-  console.log("models: "+models)
+  console.log("models: " + models)
   swal({
-      title: 'Select new model',
-      input: 'select',
-      inputOptions: models["names"],
-      inputPlaceholder: 'Select a model',
-      showCancelButton: true,
-      inputValidator: (value) => {
-          return new Promise((resolve) => {
-              if (value == "" || value == undefined) 
-                return !value && resolve('Select a correct model')
-              console.log("value; "+value);
-              
-              if( actualModel != value){
-                localStorage.setItem("actualModel",value)
-                swal(
-                        'Model changed',
-                        'You changed to model "' + value + '"',
-                        'success'
-                    ).then((result) => {
-                      location.reload();
-                    })
-              }
-              
-              
+    title: 'Select new model',
+    input: 'select',
+    inputOptions: models["names"],
+    inputPlaceholder: 'Select a model',
+    showCancelButton: true,
+    inputValidator: (value) => {
+      return new Promise((resolve) => {
+        if (value == "" || value == undefined)
+          return !value && resolve('Select a correct model')
+        console.log("value; " + value);
 
+        actualModel = localStorage.getItem("actualModel");
+        console.log("value; " + actualModel);
+        if (actualModel !== value) {
+          localStorage.setItem("actualModel", value)
+          swal(
+            'Model changed',
+            'You changed to model "' + value + '"',
+            'success'
+          ).then((result) => {
+            eqValues = {};
+            location.reload();
           })
-      }
+        } else {
+          return !value && resolve('Select a correct model')
+        }
+
+
+
+
+      })
+    }
   })
 }
 

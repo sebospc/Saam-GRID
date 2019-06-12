@@ -15,7 +15,7 @@ const secondSelectNodeColor = "#333FFF";
 const padding = 60;
 const horizontalPadding = 10;
 const verticalPadding = 3;
-const coeffMovement = 5;
+const coeffMovement = 15;
 const scaleText = radius / 2; //Defualt scale text
 
 var focus_node = null, highlight_node = null; //this variables will be used to occult the nodes.
@@ -176,7 +176,7 @@ function assignPosition(nodes, types, subTypes) {
         maxRadius = element.length * 4 + 10
     })
     
-    item.radius = maxRadius;
+    item.radius = maxRadius+5*array.length;
   });
 
   nodes.forEach((item) => {
@@ -276,7 +276,12 @@ function createGraph(nodes_data, links_data) {
       array = d.Label.split(" ");
       head = array[0];
       tail = array.slice(1);
-      label = head;
+      if(array.length < 2){
+        label = "<tspan x=0 dy=0 >" + head + "</tspan>"
+      }else{
+        label = "<tspan x=0 dy=-16 >" + head + "</tspan>"
+      }
+      
       tail.forEach(function(element){
         label += "<tspan x=0 dy=16 >" + element + "</tspan>"
       })

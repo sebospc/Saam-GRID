@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 	<title>Login</title>
 	<meta charset="UTF-8">
@@ -9,8 +10,9 @@
 	<link rel="stylesheet" type="text/css" href="login.css">
 
 </head>
+
 <body>
-	
+
 	<div class="limiter">
 		<div class="container-login100">
 			<div class="wrap-login100">
@@ -32,22 +34,37 @@
 					</div>
 
 					<div class="wrap-input100">
-							<input class="input100" type="text" id="inputUser" placeholder="Your username">
-							<span class="focus-input100"></span>
-							<span class="symbol-input100">
-								<i class="fa fa-wrench" aria-hidden="true"></i>
-							</span>
-						</div>
-					
+						<input class="input100" type="text" id="inputUser" placeholder="Your username">
+						<span class="focus-input100"></span>
+						<span class="symbol-input100">
+							<i class="fa fa-wrench" aria-hidden="true"></i>
+						</span>
+					</div>
+
 
 					<div class="container-login100-form-btn">
-							
-							<input type="button" class="login100-form-btn" onclick="login()" value="Start" />
+
+						<input type="button" class="login100-form-btn" onclick="login()" value="Start" />
 					</div>
+
+					<div class="wrap-input100">
+						<input class="input100" type="text" id="server" placeholder="server: ">
+						<span class="focus-input100"></span>
+						<span class="symbol-input100">
+							<i class="fa fa-wrench" aria-hidden="true"></i>
+						</span>
+					</div>
+
+					<div class="container-login100-form-btn">
+
+						<input type="button" class="login100-form-btn" onclick="changeServerLogin()" value="ChangeServer" />
+					</div>
+
 					<script type="text/javascript" src="login.js"></script>
 				</form>
 			</div>
 		</div>
 	</div>
 </body>
+
 </html>

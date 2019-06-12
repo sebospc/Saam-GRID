@@ -1,8 +1,16 @@
 
 const config = require('../../../config');
-const url = config.directionBack
+
+
+if(localStorage.getItem("server") == undefined){
+    localStorage.setItem("server",config.directionBack);
+}
+
+
 
 function defaultRequest(typeRequest, methodName, headers, body, callback) {
+    var url = localStorage.getItem("server");
+    
     var http = new XMLHttpRequest();
     http.responseType = 'json';
     http.open(typeRequest, url + methodName, true);

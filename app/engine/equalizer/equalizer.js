@@ -2,6 +2,7 @@
 Chart.defaults.global.defaultFontColor = 'black';
 Chart.defaults.global.defaultFontSize = '11';
 function makeGraph(keys,dataSets,start,end){
+    console.log(" start:  "+start+ " end: "+end);
     console.log(start)
     if(myChart)
         myChart.destroy()
@@ -18,8 +19,8 @@ function makeGraph(keys,dataSets,start,end){
                     stacked: true,
                     ticks: {
                         max: 1,       
-                        maxRotation: 0,
-                        minRotation: 0,
+                        maxRotation: 90,
+                        minRotation: 90,
                         autoSkip: false
                     }
                 }],
@@ -29,7 +30,7 @@ function makeGraph(keys,dataSets,start,end){
                         min: parseFloat(start),
                         max: parseFloat(end),
                         maxRotation: 0,
-                        minRotation: 0
+                        minRotation: 0,
                     }
                 }]
             },

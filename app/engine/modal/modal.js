@@ -8,17 +8,19 @@ var getEqBttn = document.getElementById("getEqBttn");
 var expected = document.getElementById("expected");
 var eqName = document.getElementById('actualChar');
 var actualVal = document.getElementById('actual');
+var lineSVG = document.getElementById('svgSliderLine');
 var pixX;
 var gap;
 var start;
 var end;
-
-gap = (screen.width * 0.382) * 0.023
+var maxLineRangex;
+var minLineRangex;
+gap = (screen.width/2 * 0.382) * 0.023
 output.setAttributeNS(null, "y1", 0)
-output.setAttributeNS(null, "y2", 999)
+output.setAttributeNS(null, "y2", 1200)
 pixX = ((screen.width * 0.382) - gap) / 100
-output.setAttributeNS(null, "x1", 0 * pixX + gap)
-output.setAttributeNS(null, "x2", 0 * pixX + gap)
+output.setAttributeNS(null, "x1", 0 )
+output.setAttributeNS(null, "x2", 0 )
 // Listen for outside click
 window.addEventListener('click', outsideClick);
 
@@ -28,15 +30,22 @@ window.addEventListener('click', outsideClick);
 
 // Function to open modal
 async function openModal(name) {
-    var aux = await requestCall( 'GET', '/getEqualiser',{"folder": actualModel}, {} );
+    
+    var aux = await requestCall( 'GET', '/getEqualiser',{"username": localStorage.getItem("username"),"folder": actualModel}, {} );
     var names = aux["values"];
-
+    if(newEq){
+        eqValues = names;
+        console.log("reset names")
+        newEq = false;
+    }
     var auxData = aux[name];
     
     if (auxData == null) {
         modal.style.display = 'none';
         return false;
     }
+    
+
     document.getElementById('actualChar').innerText = name;
     var data = transpose(auxData)
     end = data[0][0]
@@ -46,8 +55,8 @@ async function openModal(name) {
     for (i = 0; i < data.length; i++) {
         fixArr[i] = start;
     }
-    var actualValue = names[name];
-    setSliderOnce(actualValue)
+    var actualValue = eqValues[name];
+    
     data.splice(0, 1);
     //for names 
     keys = Object.keys(data)
@@ -55,6 +64,7 @@ async function openModal(name) {
     const chroma = require("chroma-js")
     var bez = chroma.scale(['black', 'red', 'yellow', 'yellowgreen', 'green']).classes(15);
     var arr = new Array(data[keys[0]].length);
+    
     var color = new Array(data[keys[0]].length);
 
     for (j = 0; j < arr.length; j++) {
@@ -80,6 +90,29 @@ async function openModal(name) {
     dataSets.unshift({ "data": fixArr, "backgroundColor": color[0], "borderWitdth": 1 })
     modal.style.display = 'block';
     makeGraph(keysArr, dataSets, start, end);
+    max = 0;
+    for(i = 0; i < keysArr.length; i++){
+        if(keysArr[i].length > max){
+            max = keysArr[i].length
+        }
+    }
+    
+    offset = 50*max/11 + 5;
+    
+    slider.style.width = "calc(100%)";
+    maxLineRangex = slider.offsetWidth;
+    slider.style.width = "calc(100% - "+offset+"px)";
+    
+    minLineRangex = maxLineRangex - slider.offsetWidth+gap*2+gap/2;
+    maxLineRangex = maxLineRangex- gap/2 ;
+    console.log("max: "+maxLineRangex);
+    console.log("min: "+minLineRangex);
+    slider.style.marginLeft = (offset)+gap+'px';
+    console.log("max: "+max);
+    console.log("offset: "+offset)
+    setSliderOnce(actualValue)
+    
+    
     return true;
 }
 
@@ -101,11 +134,12 @@ function transpose(a) {
 
 
 slider.oninput = function () {
-    gap = (screen.width * 0.382) * 0.023
-    pixX = ((screen.width * 0.382) - gap) / 100
-    output.setAttributeNS(null, "x1", this.value * pixX + gap)
-    output.setAttributeNS(null, "x2", this.value * pixX + gap)
+    
+    
     actualVal.innerText = mapRange([0, 100], [start, end], this.value);
+    var lineX = mapRange( [0, 100], [minLineRangex, maxLineRangex], this.value)
+    output.setAttributeNS(null, "x1", lineX)
+    output.setAttributeNS(null, "x2", lineX)
 }
 
 var mapRange = function (from, to, s) {
@@ -140,16 +174,18 @@ expected.onkeypress = function (event) {
 
 function setSliderOnce(auxValue) {
     var value = mapRange([start, end], [0, 100], auxValue)
+    var lineX = mapRange( [0, 100], [minLineRangex, maxLineRangex], value)
     slider.value = value;
-    output.setAttributeNS(null, "x1", (value) * pixX + gap)
-    output.setAttributeNS(null, "x2", (value) * pixX + gap)
+    output.setAttributeNS(null, "x1", lineX);//(value) * pixX + gap)
+    output.setAttributeNS(null, "x2", lineX);//(value) * pixX + gap)
     actualVal.innerText = auxValue;
 }
 
 function setSlider(value) {
     slider.value = value;
-    output.setAttributeNS(null, "x1", (value) * pixX + gap)
-    output.setAttributeNS(null, "x2", (value) * pixX + gap)
+    var lineX = mapRange( [0, 100], [minLineRangex, maxLineRangex], value)
+    output.setAttributeNS(null, "x1", lineX)
+    output.setAttributeNS(null, "x2", lineX)
     actualVal.innerText = mapRange([0, 100], [start, end], value);
 }
 
@@ -173,7 +209,11 @@ getEqBttn.onclick = function () {
                 'The petition for a new equalizer was sent',
                 'success'
             )
-            var result = await requestCall( 'POST', '/updateEqualiser',{}, {name: eqName.innerText, value: actualVal.innerText} );
+            
+            console.log("eqvalues pre "+JSON.stringify(eqValues))
+            eqValues[eqName.innerText] = actualVal.innerText;
+            console.log("eqvalues post "+JSON.stringify(eqValues))
+            var result = await requestCall( 'POST', '/updateEqualiser',{}, {name: eqName.innerText, value: actualVal.innerText, folder: actualModel} );
             
             console.log("result: "+result)
             console.log("eqName: " + eqName.innerText);

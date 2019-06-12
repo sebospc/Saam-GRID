@@ -14,11 +14,11 @@
     <div class="btn-toggle-nav" onclick="toggleNav()"></div>
     <ul>
 
-        <li> <a href="#" onclick="undo()"> <i class="fa fa-undo" aria-hidden="true"></i> undo</a></li>
-        <li><a href="#" onclick="redo()"><i class="fa fa-repeat" aria-hidden="true"></i> redo</a></li>
+        
         <li><a href="#" onclick="resize()"><i class="fa fa-expand" aria-hidden="true"></i> resize</a></li>
         <li><a href="#" onclick="exitOfModel()"><i class="fa fa-times" aria-hidden="true"></i> exit</a></li>
         <li><a href="#" onclick="saveModel()"><i class="fa fa-save" aria-hidden="true"></i> save</a></li>
+        <li><a href="#" onclick="changeServer()"><i class="fa fa-server" aria-hidden="true"></i> Server</a></li>
 
         <li><a href="#" style="position: absolute; right: 0%; width: 14%; ">
                 <label style="padding: 10px">Effects </label>
@@ -70,7 +70,7 @@
             <label id="actualChar" class="labelChar"></label>
             <div class="slidecontainer">
                 <input type="range" min="0" max="100" value="0" class="slider2" id="rangeSlider">
-                <svg width="100%" height="240%">
+                <svg width="100%" height="240%" id="svgSliderLine">
                     <line id="rangeLine" class="svgLine" />
                 </svg>
             </div>
@@ -93,12 +93,13 @@
         const swal = require("sweetalert2");
         const Chart = require("chart.js")
         var myChart;
-
+        var newEq = true;
         var models;
         var keysArr = [];
         var actualModel = ""; //Default Cooler
         var ctx = document.getElementById("myChart").getContext('2d');
         var myChart = new Chart(ctx, null)
+        var eqValues;
         chargeModels();
         async function chargeModels() {
             models = await requestCall('GET', "/getModelsNames", {}, {})
