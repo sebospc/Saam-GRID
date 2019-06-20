@@ -120,7 +120,7 @@ async function init() {
   //nodes = await requestCall('GET', '/getNodes', {"fileName":"ejemplocooler_node","infoName":"infoCooler","variablesFileName":"Workbook1"}, {});
   edges = await requestCall('GET', '/getEdges', models["models"][actualModel]["edges"], {})
   //edges = await requestCall('GET', '/getEdges', {"fileName":"ejemplocooler_edge"}, {})
-  var types = [0, 1, 2];
+  var types = [2, 1, 0];
   var subTypes = [3, 4, 5];
   createGraph(assignPosition(nodes, types, subTypes), edges);
 }
