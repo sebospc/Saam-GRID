@@ -121,6 +121,10 @@ function outsideClick(e) {
     if (e.target == modal) {
         modal.style.display = 'none';
     }
+    var modalFiles = document.getElementById('modalFiles');
+    if(e.target == modalFiles){
+        modalFiles.style.display = 'none';
+    }
 }
 
 function transpose(a) {
@@ -147,7 +151,7 @@ var mapRange = function (from, to, s) {
 };
 
 setBttn.onclick = function () {
-    if (expected.value > 1 || expected.value < 0 || !Number.isInteger(parseInt(expected.value))) {
+    if (!Number.isInteger(parseInt(expected.value))) {
 
         swal({
             title: 'Error!',

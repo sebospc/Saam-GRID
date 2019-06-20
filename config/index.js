@@ -4,16 +4,16 @@ const defaultPort = 3000;
 var config = {
   development: {
     port: process.env.PORT || defaultPort,
-    directionBack: "http://localhost:3000"
+    directionBack: "http://saam-grid.tk"
   },
   test: {
     port: process.env.PORT || defaultPort,
-    directionBack: "http://localhost:3000",
+    directionBack: "http://saam-grid.tk",
     env: env
   },
   production: {
     port: process.env.PORT || defaultPort,
-    directionBack: "http://localhost:3000"
+    directionBack: "http://saam-grid.tk"
   }
 };
 

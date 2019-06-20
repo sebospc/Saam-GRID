@@ -114,7 +114,7 @@ g = svg.append("g").attr("class", "everything")
 
 
 async function init() {
-  
+
 
   nodes = await requestCall('GET', '/getNodes', models["models"][actualModel]["nodes"], {});
   //nodes = await requestCall('GET', '/getNodes', {"fileName":"ejemplocooler_node","infoName":"infoCooler","variablesFileName":"Workbook1"}, {});
@@ -171,12 +171,12 @@ function assignPosition(nodes, types, subTypes) {
   nodes.forEach((item) => {
     maxRadius = radius;
     array = item.Label.split(" ");
-    array.forEach(function(element){
-      if((element.length * 4 + 10) > maxRadius)
+    array.forEach(function (element) {
+      if ((element.length * 4 + 10) > maxRadius)
         maxRadius = element.length * 4 + 10
     })
-    
-    item.radius = maxRadius+5*array.length;
+
+    item.radius = maxRadius + 5 * array.length;
   });
 
   nodes.forEach((item) => {
@@ -189,8 +189,8 @@ function assignPosition(nodes, types, subTypes) {
       keysArr.push(item.Label)
   })
   //(radius > ("" + d.Label).length * 4 + 10) ? radius : ("" + d.Label).length * 4 + 10;
-  nodes.sort(function(a,b){
-    b.radius-a.radius
+  nodes.sort(function (a, b) {
+    b.radius - a.radius
   })
   return nodes;
 }
@@ -276,26 +276,43 @@ function createGraph(nodes_data, links_data) {
       array = d.Label.split(" ");
       head = array[0];
       tail = array.slice(1);
-      if(array.length < 2){
+      if (array.length < 2) {
         label = "<tspan x=0 dy=0 >" + head + "</tspan>"
-      }else{
+      } else {
         label = "<tspan x=0 dy=-16 >" + head + "</tspan>"
       }
-      
-      tail.forEach(function(element){
+
+      tail.forEach(function (element) {
         label += "<tspan x=0 dy=16 >" + element + "</tspan>"
       })
       return label;
     }).style('fill', 'rgb(50,50,50)')
-    
+
 
 
 
 
   //This function is for effect selectable nodes, when mouse deselect node, the opacity come to normall value
   //for more inforation you can check this page http://bl.ocks.org/eyaler/10586116
-  assignEffectOfClick();
 
+  //assignEffectOfClick();
+  node.on("mouseover", function (d) {
+  }).on("mousedown", function (d) {
+  }).on("mouseout", function (d) {
+  });
+  node.on("click", async function (d) {
+    d3.event.stopPropagation();
+    bol = await openModal(d.Label)
+    console.log("bol: " + bol);
+
+    if (!bol) {
+      swal({
+        title: d.Label,
+        text: metadataModels[d.Label]
+      })
+    }
+  });
+  drag_handler(node);
   //drag handler
   //d is the node 
   var currentX, currentY;
@@ -395,18 +412,18 @@ function assignEffectOfClick() {
     }).on("mouseout", function (d) {
       exit_highlight();
     });
-  node.on("click", async function (d) { 
-    d3.event.stopPropagation(); 
+  node.on("click", async function (d) {
+    d3.event.stopPropagation();
     bol = await openModal(d.Label)
-    console.log("bol: "+bol);
-    
-    if(!bol){
-      console.log("label doesn't exist")
+    console.log("bol: " + bol);
+
+    if (!bol) {
       swal({
         title: d.Label,
-        text: "algo"
+        text: metadataModels[d.Label]
       })
-    } });
+    }
+  });
   drag_handler(node);
 }
 

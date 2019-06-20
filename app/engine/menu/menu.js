@@ -1,3 +1,21 @@
+const { dialog } = require('electron').remote;
+var fs = require('fs');
+var XLSX = require('xlsx');
+
+var modelNameSend = document.getElementById("expect");
+var pythonFileButton = document.getElementById("pythonFileButton");
+var pythonFileLabel = document.getElementById("pythonFileLabel");
+var infoFileButton = document.getElementById("infoFileButton");
+var infoFileLabel = document.getElementById("infoFileLabel");
+var edgesFileButton = document.getElementById("edgesFileButton");
+var edgesFileLabel = document.getElementById("edgesFileLabel");
+var nodesFileButton = document.getElementById("nodesFileButton");
+var nodesFileLabel = document.getElementById("nodesFileLabel");
+var excelFileLabel = document.getElementById("excelFileLabel");
+var excelFileButton = document.getElementById("excelFileButton");
+var sendButton = document.getElementById("sendButton");
+
+
 let toggleNavStatus = false;
 //nombre ,model{name,equalizerStatus:{}}
 
@@ -158,7 +176,7 @@ let changeServer = function () {
   }).then((result) => {
     console.log()
     if (result.value) {
-      localStorage.setItem("server",result.value);
+      localStorage.setItem("server", result.value);
     }
   })
 }
@@ -186,9 +204,9 @@ let originalModel = function () {
     cancelButtonColor: '#d33',
     confirmButtonText: 'Yes, reset it!'
   }).then(async function (result) {
-    if (result.value){
-      
-      await requestCall( 'GET', '/resetEqualiser',{"folder": actualModel, "username": localStorage.getItem("username")}, {} );
+    if (result.value) {
+
+      await requestCall('GET', '/resetEqualiser', { "folder": actualModel, "username": localStorage.getItem("username") }, {});
 
       location.reload();
     }
@@ -196,8 +214,8 @@ let originalModel = function () {
 }
 
 
-let saveModel = async function(){
-  if(eqValues != undefined){
+let saveModel = async function () {
+  if (eqValues != undefined) {
     swal({
       title: 'Are you sure?',
       text: "You won't be able to revert this!",
@@ -208,16 +226,16 @@ let saveModel = async function(){
       confirmButtonText: 'Yes'
     }).then(async function (result) {
       if (result.value)
-        await requestCall( 'POST', '/saveModel',{}, {username: localStorage.getItem("username"), model: actualModel, equaliser: eqValues });     
+        await requestCall('POST', '/saveModel', {}, { username: localStorage.getItem("username"), model: actualModel, equaliser: eqValues });
     })
-  }else{
+  } else {
     swal({
       title: 'Error',
       text: "Equaliser is empty",
       type: 'warning',
     })
   }
-  
+
 }
 
 /**
@@ -265,3 +283,73 @@ let changeModel = async function () {
   })
 }
 
+let uploadModel = async function () {
+  var modalFiles = document.getElementById('modalFiles');
+  modalFiles.style.display = 'block';
+
+}
+
+
+var pythonFilename, infoFilename, nodesFilename, edgesFilename, excelFilename;
+pythonFileButton.onclick = function () {
+  dialog.showOpenDialog((filename) => {
+    pythonFilename = filename + "";
+    pythonFileLabel.innerText = filename;
+  })
+}
+
+infoFileButton.onclick = function () {
+  dialog.showOpenDialog((filename) => {
+    infoFilename = filename + "";
+    infoFileLabel.innerText = filename;
+  })
+}
+edgesFileButton.onclick = function () {
+  dialog.showOpenDialog((filename) => {
+    edgesFilename = filename + "";
+    edgesFileLabel.innerText = filename;
+  })
+}
+nodesFileButton.onclick = function () {
+  dialog.showOpenDialog((filename) => {
+    nodesFilename = filename + "";
+    nodesFileLabel.innerText = filename;
+  })
+}
+
+excelFileButton.onclick = function () {
+  dialog.showOpenDialog((filename) => {
+    excelFilename = filename + "";
+    excelFileLabel.innerText = filename;
+  })
+}
+
+sendButton.onclick = function () {
+
+  fs.readFile(pythonFilename, 'utf8', function (err, pythonData) {
+    if (err) return console.log(err);
+    fs.readFile(infoFilename, 'utf8', function (err, infoData) {
+      if (err) return console.log(err);
+      fs.readFile(edgesFilename, 'utf8', function (err, edgesData) {
+        if (err) return console.log(err);
+        fs.readFile(nodesFilename, 'utf8', function (err, nodesData) {
+          if (err) return console.log(err);
+          fs.readFile(excelFilename, 'utf8', async function (err, excelData) {
+            if (err) return console.log(err);
+            var workbook = XLSX.readFile(excelFilename);
+            var sheet_name_list = workbook.SheetNames;
+            var xlData = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+            
+            
+            //await requestCall('POST', '/createNewModel', {}, { modelName: modelNameSend.value, pythonCode: pythonData, infoFile: infoData, edges: edgesData, nodes: nodesData, excel: JSON.stringify(xlData)});
+            var modalFiles = document.getElementById('modalFiles');
+            modalFiles.style.display = 'none';
+
+          });
+        });
+      });
+    });
+  });
+
+
+}

@@ -14,18 +14,20 @@
     <div class="btn-toggle-nav" onclick="toggleNav()"></div>
     <ul>
 
-        
+
         <li><a href="#" onclick="resize()"><i class="fa fa-expand" aria-hidden="true"></i> resize</a></li>
         <li><a href="#" onclick="exitOfModel()"><i class="fa fa-times" aria-hidden="true"></i> exit</a></li>
         <li><a href="#" onclick="saveModel()"><i class="fa fa-save" aria-hidden="true"></i> save</a></li>
-        <li><a href="#" onclick="changeServer()"><i class="fa fa-server" aria-hidden="true"></i> Server</a></li>
+        <li><a href="#" onclick="changeServer()"><i class="fa fa-server" aria-hidden="true"></i> server</a></li>
+        <li><a href="#" onclick="uploadModel()"><i class="fa fa-upload" aria-hidden="true"></i> upload model</a>
+        </li>
 
         <li><a href="#" style="position: absolute; right: 0%; width: 14%; ">
                 <label style="padding: 10px">Effects </label>
 
 
                 <label class="switch">
-                    <input type="checkbox" id="checkEffect" checked onclick="disabEnabEffect()">
+                    <input type="checkbox" id="checkEffect"  onclick="disabEnabEffect()">
                     <span class="slider round"></span>
                 </label></li></a>
     </ul>
@@ -84,6 +86,25 @@
         </div>
 
     </div>
+    <div id="modalFiles" class="modal">
+        <div id="contentModal" class="modal-content">
+            <form>                
+                 Model name: <input type="text" id="expect"><br>
+                 Python file: <button type="button" id="pythonFileButton">Select File</button>
+                 <label id="pythonFileLabel" class="label"> No file selected </label><br>
+                 Info file: <button type="button" id="infoFileButton">Select File</button>
+                 <label id="infoFileLabel" class="label"> No file selected </label><br>
+                 Edges file: <button type="button" id="edgesFileButton">Select File</button>
+                 <label id="edgesFileLabel" class="label"> No file selected </label><br>
+                 Nodes file: <button type="button" id="nodesFileButton">Select File</button>
+                 <label id="nodesFileLabel" class="label"> No file selected </label><br>
+                 Excel file: <button type="button" id="excelFileButton">Select File</button>
+                 <label id="excelFileLabel" class="label"> No file selected </label><br>
+                 <button type="button" id="sendButton">Send</button>
+                 
+            </form>
+        </div>
+    </div>
 
     <script>
         const requestCall = require("../../controllers/request");
@@ -100,19 +121,23 @@
         var ctx = document.getElementById("myChart").getContext('2d');
         var myChart = new Chart(ctx, null)
         var eqValues;
+        var metadataModels = {};
         chargeModels();
         async function chargeModels() {
             models = await requestCall('GET', "/getModelsNames", {}, {})
-            console.log("remote model"+localStorage.getItem( "actualModel" ));
-            if(!localStorage.getItem( "actualModel" )){
-               actualModel = Object.keys(models["names"])[0];
-               localStorage.setItem( "actualModel", actualModel );
-            }else{
-                actualModel = localStorage.getItem( "actualModel" );
+            
+            console.log("remote model" + localStorage.getItem("actualModel"));
+            if (!localStorage.getItem("actualModel")) {
+                actualModel = Object.keys(models["names"])[0];
+                localStorage.setItem("actualModel", actualModel);
+            } else {
+                actualModel = localStorage.getItem("actualModel");
             }
-            console.log("actual model: "+actualModel)
-            
-            
+            console.log("actual model: " + actualModel)
+            metadataModels = await requestCall('GET', "/getModelsMetadata", models["models"][actualModel]["metadatas"], {})
+            console.log("metada: "+JSON.stringify( metadataModels))
+
+
             init();
         }
     </script>
@@ -121,8 +146,6 @@
     <script type="text/javascript" src="main.js"></script>
     <script type="text/javascript" src="../equalizer/equalizer.js"></script>
     <script type="text/javascript" src="../graph/graph2D.js"></script>
-
-
 </body>
 
 </html>
